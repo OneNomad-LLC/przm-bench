@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tgz
+.DS_Store
+results/*.json
+!results/published/
+.env
+.env.*
+keys/*.key
+keys/*.pem
+*.secret
+.next/
+.vercel/
+.turbo/
