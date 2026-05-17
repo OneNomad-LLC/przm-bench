@@ -1,0 +1,667 @@
+{
+  "id": "longmemeval-temporal-inference-v1",
+  "benchmark": "longmemeval",
+  "subset": "temporal-inference",
+  "description": "Hand-curated 50-query temporal-inference fixture modelled on LongMemEval's temporal-reasoning category. Tests date recall, relative-time resolution, event sequencing, knowledge-update ordering, and recency ranking across multi-session conversation haystacks.",
+  "notes": "Path C (hand-curated representative subset). LongMemEval source: https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned (MIT license per HuggingFace dataset card). Data here is original; question/answer patterns are inspired by the published category taxonomy. Full LongMemEval temporal-inference fixture (all ~133 questions converted from the real dataset) lands in v0.1. To regenerate from the real dataset once licensed: see scripts/convert-longmemeval.ts.",
+  "items": [
+    {
+      "id": "sess-2024-01-03-gym",
+      "content": "user: I signed up for a gym membership today at FitLife downtown.\nassistant: Great! Which membership tier did you go with?\nuser: The annual plan — $480 for the year. They have a pool which was the deciding factor.\nassistant: That's a solid deal. Have you checked out their class schedule yet?\nuser: Not yet, starting Monday.",
+      "metadata": { "session_type": "lifestyle", "topic": "fitness" },
+      "timestamp": "2024-01-03T10:15:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-17-gym-first-week",
+      "content": "user: Finished my first two weeks at the gym. Went four times total.\nassistant: That's a solid start for January. Did you try the pool?\nuser: Twice. The lap lanes are busy mornings but empty at 7pm.\nassistant: Good to know. Setting any specific goals?\nuser: Want to swim 1km without stopping by March.",
+      "metadata": { "session_type": "lifestyle", "topic": "fitness" },
+      "timestamp": "2024-01-17T19:30:00.000Z"
+    },
+    {
+      "id": "sess-2024-02-14-gym-cancel",
+      "content": "user: I cancelled my gym membership today.\nassistant: Oh — what happened?\nuser: I'm moving to a new apartment in March that has its own gym included. No point paying double.\nassistant: Makes sense. Did FitLife give you a refund for the remaining months?\nuser: Pro-rated refund of $360 back to my card.",
+      "metadata": { "session_type": "lifestyle", "topic": "fitness" },
+      "timestamp": "2024-02-14T14:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-10-job-offer",
+      "content": "user: I got a job offer today from Meridian Tech — senior backend engineer role.\nassistant: Congratulations! How are you feeling about it?\nuser: Excited but nervous. The salary is $145k which is a 20% bump from my current role.\nassistant: That's a meaningful increase. When do they need a decision by?\nuser: January 17th.",
+      "metadata": { "session_type": "career", "topic": "job-search" },
+      "timestamp": "2024-01-10T17:45:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-16-job-accept",
+      "content": "user: I accepted the Meridian Tech offer.\nassistant: Great news! When do you start?\nuser: February 19th. I gave two weeks notice at my current job today.\nassistant: How did your current manager take it?\nuser: Professionally — she said she expected it since I'd been interviewing.",
+      "metadata": { "session_type": "career", "topic": "job-search" },
+      "timestamp": "2024-01-16T20:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-02-19-job-start",
+      "content": "user: First day at Meridian Tech done. It was overwhelming in a good way.\nassistant: What was the biggest surprise?\nuser: The codebase is much cleaner than I expected for a 7-year-old startup. Strong TypeScript discipline throughout.\nassistant: Always a good sign. Did you meet the full team?\nuser: Most of them — 11 engineers total on the backend squad.",
+      "metadata": { "session_type": "career", "topic": "job-start" },
+      "timestamp": "2024-02-19T18:30:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-22-dentist",
+      "content": "user: Just got back from the dentist. First time in two years, I was dreading it.\nassistant: How did it go?\nuser: Better than expected. One small cavity on the upper right molar, otherwise clean.\nassistant: Are you going back for the filling?\nuser: Scheduled for February 5th.",
+      "metadata": { "session_type": "health", "topic": "dental" },
+      "timestamp": "2024-01-22T13:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-02-05-dentist-filling",
+      "content": "user: Got my cavity filled this morning.\nassistant: All done — how was it?\nuser: Fine. Local anesthetic, took about 25 minutes. Mouth was numb for a few hours.\nassistant: Glad it went smoothly. Any follow-up needed?\nuser: Just a six-month checkup in August.",
+      "metadata": { "session_type": "health", "topic": "dental" },
+      "timestamp": "2024-02-05T11:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-03-01-apartment-move",
+      "content": "user: Moving day! Finally in the new apartment.\nassistant: How did the move go?\nuser: Long but smooth. Hired two movers, done by 2pm.\nassistant: What neighborhood did you end up in?\nuser: Eastside — about 15 minutes from Meridian Tech's office, which is the main draw.\nassistant: Shorter commute than before?\nuser: Way shorter. Was 45 minutes on transit, now 12 minutes on the bike path.",
+      "metadata": { "session_type": "lifestyle", "topic": "housing" },
+      "timestamp": "2024-03-01T20:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-03-15-bike-commute",
+      "content": "user: Two weeks into bike commuting. Loving it.\nassistant: Any issues so far?\nuser: One flat tire on day four — patched it myself. Otherwise zero problems.\nassistant: Are you tracking the distance?\nuser: About 24km a week round trip.",
+      "metadata": { "session_type": "lifestyle", "topic": "commute" },
+      "timestamp": "2024-03-15T18:45:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-05-book-start",
+      "content": "user: Started reading 'The Pragmatic Programmer' again — the 20th anniversary edition.\nassistant: A classic re-read. What's prompting it?\nuser: Starting a new role next month, want to refresh my engineering fundamentals.\nassistant: Good timing. Are you working through exercises or just reading?\nuser: Exercises too this time.",
+      "metadata": { "session_type": "learning", "topic": "books" },
+      "timestamp": "2024-01-05T21:30:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-28-book-finish",
+      "content": "user: Finished 'The Pragmatic Programmer'. Took me 23 days.\nassistant: Solid pace for a technical book with exercises. Top takeaway?\nuser: The section on orthogonality — applies directly to the microservices mess at my current job.\nassistant: Good timing before the switch.\nuser: Exactly.",
+      "metadata": { "session_type": "learning", "topic": "books" },
+      "timestamp": "2024-01-28T22:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-02-10-book-start-2",
+      "content": "user: Started 'Designing Data-Intensive Applications' by Kleppmann.\nassistant: Great choice — the chapter on replication alone is worth the price.\nuser: I'm already on chapter 3. Reading faster because I'm more engaged.\nassistant: What's drawing you to it?\nuser: Distributed systems will be a big part of the Meridian Tech role.",
+      "metadata": { "session_type": "learning", "topic": "books" },
+      "timestamp": "2024-02-10T20:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-04-02-book-finish-2",
+      "content": "user: Done with DDIA. Took about seven weeks.\nassistant: That's a thorough read for a dense book. Changed how you think about anything at work?\nuser: Already refactored how we approach our Kafka consumer group assignments based on the partition chapter.\nassistant: That's the best kind of technical reading.\nuser: Agreed.",
+      "metadata": { "session_type": "learning", "topic": "books" },
+      "timestamp": "2024-04-02T21:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-08-side-project-start",
+      "content": "user: Started a side project this weekend — a CLI tool for managing dotfiles.\nassistant: Nice. What's the stack?\nuser: Rust, using the clap crate for CLI parsing. First real Rust project.\nassistant: Ambitious for a first Rust project. What's the core feature set?\nuser: Symlink management, template substitution, and machine profiles.",
+      "metadata": { "session_type": "projects", "topic": "side-project" },
+      "timestamp": "2024-01-08T15:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-02-25-side-project-pause",
+      "content": "user: Paused the dotfiles CLI project for now.\nassistant: What happened?\nuser: New job onboarding is eating all my energy. Good problem to have.\nassistant: Makes sense to give the job priority in the first 90 days.\nuser: I'll pick it up again once I find a rhythm at Meridian.",
+      "metadata": { "session_type": "projects", "topic": "side-project" },
+      "timestamp": "2024-02-25T20:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-05-10-side-project-resume",
+      "content": "user: Picked up the dotfiles CLI project again. Three months since I last touched it.\nassistant: Welcome back. Did you manage to context-switch back in quickly?\nuser: Took a few hours but yes. Rust's ownership errors reminded me where I left off.\nassistant: What's left to ship?\nuser: Template substitution — the last of the three core features.",
+      "metadata": { "session_type": "projects", "topic": "side-project" },
+      "timestamp": "2024-05-10T19:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-05-24-side-project-shipped",
+      "content": "user: Shipped v0.1 of the dotfiles CLI to GitHub today.\nassistant: Milestone! How does it feel?\nuser: Great — took five months total but it works. Symlinks, templates, and machine profiles all functional.\nassistant: Will you maintain it?\nuser: Yes. A coworker at Meridian already wants to try it.",
+      "metadata": { "session_type": "projects", "topic": "side-project" },
+      "timestamp": "2024-05-24T21:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-02-28-conference",
+      "content": "user: Registered for QCon London in March. Three-day conference.\nassistant: Nice. Any sessions you're particularly targeting?\nuser: The distributed systems track and a workshop on observability with OpenTelemetry.\nassistant: Useful given the Meridian role.\nuser: That's exactly why I chose those.",
+      "metadata": { "session_type": "career", "topic": "conference" },
+      "timestamp": "2024-02-28T12:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-03-20-conference-recap",
+      "content": "user: Back from QCon London. Excellent conference.\nassistant: What was the best session?\nuser: A talk on CRDT-based collaboration by a Figma engineer. Mind-expanding.\nassistant: And the OpenTelemetry workshop?\nuser: Practical and immediately applicable — already planning to bring it to Meridian's on-call runbooks.",
+      "metadata": { "session_type": "career", "topic": "conference" },
+      "timestamp": "2024-03-20T17:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-19-language-learning",
+      "content": "user: Started a Spanish course on Duolingo. Aiming for 20 minutes a day.\nassistant: Great habit to build. Any particular reason for Spanish?\nuser: Planning a trip to Colombia in the autumn. Want to be conversational, not just tourist-level.\nassistant: Practical motivation helps with consistency.\nuser: That's the plan.",
+      "metadata": { "session_type": "learning", "topic": "language" },
+      "timestamp": "2024-01-19T07:30:00.000Z"
+    },
+    {
+      "id": "sess-2024-04-14-language-streak",
+      "content": "user: Hit a 85-day Duolingo streak today.\nassistant: That's impressive consistency — almost three months of daily practice.\nuser: It became part of my morning routine. Do it before coffee now.\nassistant: How's the Spanish feeling?\nuser: I can follow slow conversations. Reading is better than listening.",
+      "metadata": { "session_type": "learning", "topic": "language" },
+      "timestamp": "2024-04-14T08:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-06-01-language-class",
+      "content": "user: Signed up for in-person Spanish classes. One session per week at the community center.\nassistant: Upgrading from Duolingo — what triggered the shift?\nuser: I realized I needed conversation practice, not just vocabulary drilling. Duolingo doesn't do that well.\nassistant: Smart move ahead of the Colombia trip.\nuser: That's the plan — classes until September then the trip.",
+      "metadata": { "session_type": "learning", "topic": "language" },
+      "timestamp": "2024-06-01T18:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-03-05-investment-change",
+      "content": "user: Moved my index fund allocation today — shifted from 80/20 equities/bonds to 90/10.\nassistant: More aggressive — what drove the change?\nuser: I'm 31, new higher-paying job. Time horizon is long and I can handle more volatility.\nassistant: Sounds reasoned. What platform?\nuser: Fidelity — their FZROX and FXNAX funds.",
+      "metadata": { "session_type": "finance", "topic": "investing" },
+      "timestamp": "2024-03-05T16:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-06-15-investment-review",
+      "content": "user: Did a mid-year investment review. Up 9.3% YTD on the main portfolio.\nassistant: Solid performance for the first half. Any rebalancing needed?\nuser: Still within my target bands — no action needed.\nassistant: Sticking with the 90/10 split?\nuser: Yes. No reason to change it.",
+      "metadata": { "session_type": "finance", "topic": "investing" },
+      "timestamp": "2024-06-15T14:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-04-20-dog-adopt",
+      "content": "user: I adopted a dog today. 3-year-old greyhound mix named Theo.\nassistant: Wonderful news! What's Theo like?\nuser: Calm, a bit shy at first, but already following me room to room. Very gentle.\nassistant: Greyhounds are often couch potatoes despite the breed reputation.\nuser: The shelter said exactly that. Two walks a day should be enough.",
+      "metadata": { "session_type": "lifestyle", "topic": "pets" },
+      "timestamp": "2024-04-20T16:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-04-27-dog-first-week",
+      "content": "user: Theo has been with me a week. He's already sleeping on the bed.\nassistant: Fast work from Theo. Any settling-in challenges?\nuser: He was anxious the first two nights — pacing. Now he's completely relaxed.\nassistant: Classic greyhound adjustment arc.\nuser: Vet appointment booked for May 3rd for a full checkup.",
+      "metadata": { "session_type": "lifestyle", "topic": "pets" },
+      "timestamp": "2024-04-27T20:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-05-03-dog-vet",
+      "content": "user: Theo's vet checkup came back clean. Healthy weight, good teeth.\nassistant: Great news. Any vaccinations needed?\nuser: Bordetella booster due in six months, everything else current from the shelter.\nassistant: Sounds like the shelter did good prep work.\nuser: Very professional organization — glad I went through them.",
+      "metadata": { "session_type": "lifestyle", "topic": "pets" },
+      "timestamp": "2024-05-03T15:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-03-28-salary-negotiation",
+      "content": "user: I asked for a raise today at Meridian — requested $162k from $145k.\nassistant: Bold move at six weeks in. What was the reception?\nuser: My manager said she'd take it to the quarterly review in June.\nassistant: Reasonable — you came in with the logic?\nuser: Yes: two production incidents resolved in my first month, plus the Kafka refactor.",
+      "metadata": { "session_type": "career", "topic": "salary" },
+      "timestamp": "2024-03-28T17:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-06-10-salary-result",
+      "content": "user: Got my raise — $155k, up from $145k. Not the full ask but still 6.9%.\nassistant: A meaningful outcome, especially this early. Were you expecting the full $162k?\nuser: Hoped for it. Happy with $155k — shows they value the contributions.\nassistant: And sets a baseline for the next conversation.\nuser: Exactly — already thinking about the year-end review.",
+      "metadata": { "session_type": "career", "topic": "salary" },
+      "timestamp": "2024-06-10T18:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-02-01-coffee-habit",
+      "content": "user: Switched to a pour-over setup at home. Got a Hario V60 and a hand grinder.\nassistant: Nice upgrade. What prompted it?\nuser: My partner got me a bag of single-origin Ethiopian beans for my birthday and drip coffee didn't do them justice.\nassistant: Smart pivot. How does the V60 treat you?\nuser: Takes 10 minutes but the cup quality is genuinely different.",
+      "metadata": { "session_type": "lifestyle", "topic": "coffee" },
+      "timestamp": "2024-02-01T09:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-05-15-coffee-upgrade",
+      "content": "user: Upgraded to an electric burr grinder — Baratza Encore.\nassistant: Moving up in the pour-over world. What pushed you past the hand grinder?\nuser: Wrist fatigue on mornings before bike commutes. Wanted faster grinding.\nassistant: The Encore is a solid entry into electric. Noticing a cup difference?\nuser: Slightly more consistent grind. The hand grinder was already good though.",
+      "metadata": { "session_type": "lifestyle", "topic": "coffee" },
+      "timestamp": "2024-05-15T08:30:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-14-podcast-habit",
+      "content": "user: I've been listening to 'The Changelog' podcast during my commute. Great for keeping up with the OSS ecosystem.\nassistant: Good choice for staying current. Any episodes you've particularly valued recently?\nuser: One on the Deno vs Node.js state of play — clarified a lot for me.\nassistant: Useful framing?\nuser: Yes, especially the module compatibility angle.",
+      "metadata": { "session_type": "learning", "topic": "podcasts" },
+      "timestamp": "2024-01-14T08:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-04-05-podcast-switch",
+      "content": "user: Switched my main commute podcast from 'The Changelog' to 'Software Engineering Daily'. More depth per episode.\nassistant: A natural progression — Changelog is great for breadth, SE Daily for depth. What shifted the preference?\nuser: The bike commute is shorter now so I batch 2-3 episodes on the weekend instead.\nassistant: Makes sense to shift to higher-signal-per-hour content.\nuser: Exactly.",
+      "metadata": { "session_type": "learning", "topic": "podcasts" },
+      "timestamp": "2024-04-05T10:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-02-08-partner-job",
+      "content": "user: My partner accepted a job offer at a design agency in the city. She starts March 4th.\nassistant: Congratulations to her! Was it a long process?\nuser: Three rounds of interviews over six weeks. Her portfolio work for the previous agency really landed.\nassistant: A big month ahead — you both starting new jobs within days of each other.\nuser: March is going to be hectic.",
+      "metadata": { "session_type": "personal", "topic": "family" },
+      "timestamp": "2024-02-08T20:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-04-30-partner-freelance",
+      "content": "user: My partner left the design agency and went freelance.\nassistant: That was fast — barely two months. What happened?\nuser: The culture wasn't a fit — very rigid process for creative work. She had three clients lined up already.\nassistant: Impressive to have that pipeline ready so quickly.\nuser: She'd been building it on the side for a while. Calculated risk.",
+      "metadata": { "session_type": "personal", "topic": "family" },
+      "timestamp": "2024-04-30T19:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-31-marathon-signup",
+      "content": "user: Registered for the city half marathon in May. First half-marathon ever.\nassistant: Exciting goal — what's your current running base?\nuser: About 15km per week. I'll need to build to 40km+ by April.\nassistant: 16 weeks is manageable with a structured plan. Have you found one?\nuser: Using Hal Higdon's Novice 1 plan.",
+      "metadata": { "session_type": "lifestyle", "topic": "running" },
+      "timestamp": "2024-01-31T19:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-04-21-marathon-injury",
+      "content": "user: Rolled my ankle on a trail run. Swollen and tender — took the rest of the week off.\nassistant: Ouch. Have you had it looked at?\nuser: Ice and rest for now. It's not as bad as a sprain — more like a mild twist.\nassistant: Any risk to the half-marathon?\nuser: Race is May 12th. If I can resume running by April 28th I should be okay.",
+      "metadata": { "session_type": "lifestyle", "topic": "running" },
+      "timestamp": "2024-04-21T16:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-05-12-marathon-race",
+      "content": "user: Finished the half marathon — 2:07:43. So happy.\nassistant: Congratulations! How did it feel out on the course?\nuser: Miles 8-10 were brutal but I ran the final two kilometers at race pace. Exceeded my 2:15 goal.\nassistant: A 7-minute buffer on your target on a first half is excellent.\nuser: The ankle held up perfectly.",
+      "metadata": { "session_type": "lifestyle", "topic": "running" },
+      "timestamp": "2024-05-12T13:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-03-10-phone-upgrade",
+      "content": "user: Upgraded my phone today — Pixel 8 Pro. Traded in the Pixel 5.\nassistant: Nice generational jump. What pushed you to upgrade now?\nuser: Camera on the Pixel 5 was struggling with low light. The 8 Pro's night mode is in another league.\nassistant: Three years on the 5 is a good run.\nuser: Got $180 trade-in value, which softened the price.",
+      "metadata": { "session_type": "tech", "topic": "devices" },
+      "timestamp": "2024-03-10T12:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-06-20-vacation-booking",
+      "content": "user: Booked the Colombia trip — flights + Airbnb in Medellín for two weeks in October.\nassistant: Finally locked in! Departure date?\nuser: October 5th, back October 19th. Flying into José María Córdova airport.\nassistant: Medellín is a fantastic choice. Any non-Medellín stops planned?\nuser: Day trips to Guatapé and the Coffee Region.",
+      "metadata": { "session_type": "travel", "topic": "vacation" },
+      "timestamp": "2024-06-20T21:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-05-20-productivity-app",
+      "content": "user: Switched from Notion to Obsidian for my personal notes. Been migrating for a week.\nassistant: Big switch. What's the main draw?\nuser: Local-first files, markdown, and the graph view for connecting ideas. Also no monthly fee.\nassistant: The plugin ecosystem is rich too.\nuser: Already installed Dataview and Templater — genuinely powerful.",
+      "metadata": { "session_type": "productivity", "topic": "tools" },
+      "timestamp": "2024-05-20T20:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-06-05-obsidian-habit",
+      "content": "user: Two weeks into the Obsidian daily note habit. It's sticking.\nassistant: What's your daily note format?\nuser: Morning: priorities + intention. Evening: what happened, what to carry forward.\nassistant: That's a solid structure. Using any automation?\nuser: Templater fills the date header and a mood field automatically.",
+      "metadata": { "session_type": "productivity", "topic": "tools" },
+      "timestamp": "2024-06-05T21:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-04-08-car-sell",
+      "content": "user: Sold my car today. Listed it two weeks ago on Craigslist — final price $6,800.\nassistant: How long did you have it?\nuser: Six years. A 2016 Honda Civic. Ran well but the bike commute made it feel redundant.\nassistant: Decluttering around a lifestyle change — makes sense.\nuser: And Zipcar is available whenever I actually need a car.",
+      "metadata": { "session_type": "lifestyle", "topic": "transportation" },
+      "timestamp": "2024-04-08T14:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-01-25-meditation-start",
+      "content": "user: Started meditating this week — 10 minutes every morning using the Waking Up app.\nassistant: Good morning routine addition. Is this your first structured meditation practice?\nuser: First one that's lasted more than three days. The Waking Up guided sessions are less intimidating than pure silence.\nassistant: Sam Harris's introductory course?\nuser: Exactly that one.",
+      "metadata": { "session_type": "wellbeing", "topic": "meditation" },
+      "timestamp": "2024-01-25T07:30:00.000Z"
+    },
+    {
+      "id": "sess-2024-06-25-meditation-streak",
+      "content": "user: Hit 150 consecutive days of meditation this morning.\nassistant: That's a remarkable streak — five months of daily practice.\nuser: Somewhere around day 40 it stopped feeling like a discipline and started feeling like a necessity.\nassistant: What's the most noticeable effect?\nuser: Reduced reactivity during stressful situations at work. Hard to measure but very real.",
+      "metadata": { "session_type": "wellbeing", "topic": "meditation" },
+      "timestamp": "2024-06-25T07:30:00.000Z"
+    },
+    {
+      "id": "sess-2024-02-18-haircut-change",
+      "content": "user: Got a completely different haircut today — went from shoulder-length to a short crop. Dramatic change.\nassistant: Bold move. What prompted it?\nuser: Wanted something lower-maintenance ahead of the new job. No regrets — feels right.\nassistant: First reactions from people around you?\nuser: Partner loves it. Coworkers at the old job did a double-take.",
+      "metadata": { "session_type": "personal", "topic": "appearance" },
+      "timestamp": "2024-02-18T16:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-05-28-haircut-2",
+      "content": "user: Got my second crop haircut today. Same barber.\nassistant: Keeping the shorter style then.\nuser: Yes, it's become my thing. Took about 15 minutes versus the 45 the long hair needed.\nassistant: Efficiency gains.\nuser: Exactly — morning routine is 10 minutes shorter now.",
+      "metadata": { "session_type": "personal", "topic": "appearance" },
+      "timestamp": "2024-05-28T17:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-03-22-allergies",
+      "content": "user: Spring allergies hit hard this year — eyes and nose constantly irritated since last weekend.\nassistant: Worst season in a while for pollen apparently.\nuser: Started taking Zyrtec — it dulls it but doesn't eliminate it.\nassistant: Are you mostly affected indoors or outdoors?\nuser: Outdoors, especially mornings. Bike commute is rough.",
+      "metadata": { "session_type": "health", "topic": "allergies" },
+      "timestamp": "2024-03-22T18:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-04-19-allergies-clear",
+      "content": "user: Allergies have cleared up — feels like spring is over the worst of it.\nassistant: Four weeks of misery then a hard stop. Relief!\nuser: Stopped the Zyrtec three days ago and feeling fine.\nassistant: Good timing heading into the warmer months.\nuser: Perfect timing with the half-marathon training peaking too.",
+      "metadata": { "session_type": "health", "topic": "allergies" },
+      "timestamp": "2024-04-19T19:00:00.000Z"
+    },
+    {
+      "id": "sess-2024-06-08-freelance-income",
+      "content": "user: First freelance payment came in for my partner — $3,200 for a brand identity project.\nassistant: Congratulations to her on the first real freelance invoice paid.\nuser: She was nervous about cash flow but the pipeline she'd built is paying off.\nassistant: Any recurring clients forming yet?\nuser: Two clients want ongoing retainers — looks promising.",
+      "metadata": { "session_type": "personal", "topic": "family" },
+      "timestamp": "2024-06-08T18:00:00.000Z"
+    }
+  ],
+  "queries": [
+    {
+      "id": "q-t001",
+      "query": "When did I sign up for a gym membership?",
+      "expectedAnswerIds": ["sess-2024-01-03-gym"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t002",
+      "query": "When did I cancel my gym membership?",
+      "expectedAnswerIds": ["sess-2024-02-14-gym-cancel"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t003",
+      "query": "How long did I have my gym membership before cancelling?",
+      "expectedAnswerIds": ["sess-2024-01-03-gym", "sess-2024-02-14-gym-cancel"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t004",
+      "query": "When did I receive the job offer from Meridian Tech?",
+      "expectedAnswerIds": ["sess-2024-01-10-job-offer"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t005",
+      "query": "How many days passed between receiving the Meridian Tech offer and accepting it?",
+      "expectedAnswerIds": ["sess-2024-01-10-job-offer", "sess-2024-01-16-job-accept"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t006",
+      "query": "When did I start at Meridian Tech?",
+      "expectedAnswerIds": ["sess-2024-02-19-job-start"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t007",
+      "query": "What happened at the dentist before my job started at Meridian?",
+      "expectedAnswerIds": ["sess-2024-01-22-dentist"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t008",
+      "query": "When did I get my cavity filled?",
+      "expectedAnswerIds": ["sess-2024-02-05-dentist-filling"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t009",
+      "query": "What did I do on my first day at Meridian Tech?",
+      "expectedAnswerIds": ["sess-2024-02-19-job-start"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t010",
+      "query": "When did I move to my new apartment?",
+      "expectedAnswerIds": ["sess-2024-03-01-apartment-move"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t011",
+      "query": "What changed about my commute after moving?",
+      "expectedAnswerIds": ["sess-2024-03-01-apartment-move", "sess-2024-03-15-bike-commute"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t012",
+      "query": "Which book did I finish before starting at Meridian Tech?",
+      "expectedAnswerIds": ["sess-2024-01-28-book-finish"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t013",
+      "query": "When did I start reading Designing Data-Intensive Applications?",
+      "expectedAnswerIds": ["sess-2024-02-10-book-start-2"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t014",
+      "query": "How long did it take me to read DDIA?",
+      "expectedAnswerIds": ["sess-2024-02-10-book-start-2", "sess-2024-04-02-book-finish-2"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t015",
+      "query": "What happened to my side project in February?",
+      "expectedAnswerIds": ["sess-2024-02-25-side-project-pause"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t016",
+      "query": "When did I resume the dotfiles side project?",
+      "expectedAnswerIds": ["sess-2024-05-10-side-project-resume"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t017",
+      "query": "How long did the dotfiles CLI project take from start to shipping v0.1?",
+      "expectedAnswerIds": ["sess-2024-01-08-side-project-start", "sess-2024-05-24-side-project-shipped"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t018",
+      "query": "When did I attend a tech conference?",
+      "expectedAnswerIds": ["sess-2024-03-20-conference-recap"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t019",
+      "query": "What did I do for learning between starting at Meridian Tech and the QCon conference?",
+      "expectedAnswerIds": ["sess-2024-02-10-book-start-2"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t020",
+      "query": "When did I start learning Spanish?",
+      "expectedAnswerIds": ["sess-2024-01-19-language-learning"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t021",
+      "query": "What was my Duolingo streak when I reported on it in April?",
+      "expectedAnswerIds": ["sess-2024-04-14-language-streak"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t022",
+      "query": "When did I switch from Duolingo to in-person Spanish classes?",
+      "expectedAnswerIds": ["sess-2024-06-01-language-class"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t023",
+      "query": "What changed about my investment allocation in early 2024?",
+      "expectedAnswerIds": ["sess-2024-03-05-investment-change"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t024",
+      "query": "What was my portfolio allocation before the change in March?",
+      "expectedAnswerIds": ["sess-2024-03-05-investment-change"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t025",
+      "query": "When did I adopt my dog?",
+      "expectedAnswerIds": ["sess-2024-04-20-dog-adopt"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t026",
+      "query": "When did Theo have his first vet checkup?",
+      "expectedAnswerIds": ["sess-2024-05-03-dog-vet"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t027",
+      "query": "How long after adopting Theo did I take him to the vet?",
+      "expectedAnswerIds": ["sess-2024-04-20-dog-adopt", "sess-2024-05-03-dog-vet"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t028",
+      "query": "When did I ask for a raise at Meridian?",
+      "expectedAnswerIds": ["sess-2024-03-28-salary-negotiation"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t029",
+      "query": "How long did it take between asking for a raise and getting a result?",
+      "expectedAnswerIds": ["sess-2024-03-28-salary-negotiation", "sess-2024-06-10-salary-result"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t030",
+      "query": "What was my salary before and after the raise at Meridian?",
+      "expectedAnswerIds": ["sess-2024-01-10-job-offer", "sess-2024-06-10-salary-result"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t031",
+      "query": "When did I switch to a pour-over coffee setup?",
+      "expectedAnswerIds": ["sess-2024-02-01-coffee-habit"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t032",
+      "query": "What coffee equipment upgrade happened more recently — the V60 or the electric grinder?",
+      "expectedAnswerIds": ["sess-2024-05-15-coffee-upgrade"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t033",
+      "query": "When did I change my commute podcast?",
+      "expectedAnswerIds": ["sess-2024-04-05-podcast-switch"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t034",
+      "query": "What podcast was I listening to before I switched to Software Engineering Daily?",
+      "expectedAnswerIds": ["sess-2024-01-14-podcast-habit", "sess-2024-04-05-podcast-switch"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t035",
+      "query": "When did my partner start her job at the design agency?",
+      "expectedAnswerIds": ["sess-2024-02-08-partner-job"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t036",
+      "query": "How long did my partner stay at the design agency before going freelance?",
+      "expectedAnswerIds": ["sess-2024-02-08-partner-job", "sess-2024-04-30-partner-freelance"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t037",
+      "query": "When did I sign up for the half marathon?",
+      "expectedAnswerIds": ["sess-2024-01-31-marathon-signup"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t038",
+      "query": "When did I injure my ankle while training?",
+      "expectedAnswerIds": ["sess-2024-04-21-marathon-injury"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t039",
+      "query": "When did I run the half marathon and what was my finish time?",
+      "expectedAnswerIds": ["sess-2024-05-12-marathon-race"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t040",
+      "query": "What was the most recent health issue I mentioned?",
+      "expectedAnswerIds": ["sess-2024-04-19-allergies-clear"],
+      "when": "2024-05-01T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t041",
+      "query": "When did I upgrade my phone?",
+      "expectedAnswerIds": ["sess-2024-03-10-phone-upgrade"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t042",
+      "query": "When did I book the Colombia vacation?",
+      "expectedAnswerIds": ["sess-2024-06-20-vacation-booking"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t043",
+      "query": "How long before the trip did I book it, given the trip is in October?",
+      "expectedAnswerIds": ["sess-2024-06-20-vacation-booking"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t044",
+      "query": "When did I switch from Notion to Obsidian?",
+      "expectedAnswerIds": ["sess-2024-05-20-productivity-app"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t045",
+      "query": "When did I sell my car?",
+      "expectedAnswerIds": ["sess-2024-04-08-car-sell"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t046",
+      "query": "Did I sell my car before or after moving to the new apartment?",
+      "expectedAnswerIds": ["sess-2024-03-01-apartment-move", "sess-2024-04-08-car-sell"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t047",
+      "query": "When did I start meditating?",
+      "expectedAnswerIds": ["sess-2024-01-25-meditation-start"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t048",
+      "query": "How many days had I meditated consecutively by the end of June?",
+      "expectedAnswerIds": ["sess-2024-06-25-meditation-streak"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t049",
+      "query": "When did I get a new haircut style?",
+      "expectedAnswerIds": ["sess-2024-02-18-haircut-change"],
+      "when": "2024-06-30T00:00:00.000Z",
+      "category": "temporal-inference"
+    },
+    {
+      "id": "q-t050",
+      "query": "What was the most recent significant career event?",
+      "expectedAnswerIds": ["sess-2024-06-10-salary-result"],
+      "when": "2024-06-15T00:00:00.000Z",
+      "category": "temporal-inference"
+    }
+  ]
+}
