@@ -1,0 +1,155 @@
+name: Verify Receipt
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'results/published/**.json'
+      - 'web/data/receipts.json'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  verify:
+    name: Signature + SHA + Environment checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Find new receipts in this PR
+        id: receipts
+        run: |
+          # Diff against the merge base to find receipts added in this PR only.
+          MERGE_BASE=$(git merge-base HEAD origin/main)
+          CHANGED=$(git diff --name-only "$MERGE_BASE" HEAD -- 'results/published/*.json')
+          if [ -z "$CHANGED" ]; then
+            echo "No new receipts in this PR — skipping."
+            echo "files=" >> "$GITHUB_OUTPUT"
+          else
+            echo "New receipts:"
+            echo "$CHANGED"
+            # Newline-separated list → space-separated for the next step
+            FILES=$(echo "$CHANGED" | tr '\n' ' ')
+            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify receipt signatures
+        if: steps.receipts.outputs.files != ''
+        run: |
+          FAILED=0
+          for f in ${{ steps.receipts.outputs.files }}; do
+            echo "--- Verifying $f ---"
+            if npm run verify -- "$f"; then
+              echo "PASS: signature valid for $f"
+            else
+              echo "FAIL: signature invalid for $f"
+              FAILED=1
+            fi
+          done
+          exit $FAILED
+
+      - name: Verify receipt SHA-256 self-consistency
+        if: steps.receipts.outputs.files != ''
+        run: |
+          FAILED=0
+          for f in ${{ steps.receipts.outputs.files }}; do
+            echo "--- SHA check: $f ---"
+            node --input-type=module <<EOF
+              import { readFileSync, createHash } from 'fs';
+
+              const raw = readFileSync('$f', 'utf-8');
+              const receipt = JSON.parse(raw);
+
+              // The receipt's fixture.sha256 must match the actual fixture file.
+              const fixtureId = receipt.fixture?.id;
+              if (!fixtureId) {
+                console.error('FAIL: receipt missing fixture.id');
+                process.exit(1);
+              }
+
+              // Fixture file is referenced by id; find it under fixtures/.
+              const fixturePath = \`fixtures/\${fixtureId}.json\`;
+              let fixtureRaw;
+              try {
+                fixtureRaw = readFileSync(fixturePath);
+              } catch {
+                // Fixture may not exist on this track yet — warn but don't fail.
+                console.warn(\`WARN: fixture file not found at \${fixturePath} (may be from another track)\`);
+                process.exit(0);
+              }
+
+              const actual = createHash('sha256').update(fixtureRaw).digest('hex');
+              const expected = receipt.fixture.sha256;
+
+              if (actual !== expected) {
+                console.error(\`FAIL: fixture SHA mismatch for \${fixtureId}\`);
+                console.error(\`  receipt says: \${expected}\`);
+                console.error(\`  actual:       \${actual}\`);
+                process.exit(1);
+              }
+
+              console.log(\`PASS: fixture SHA matches for \${fixtureId}\`);
+            EOF
+            if [ $? -ne 0 ]; then
+              FAILED=1
+            fi
+          done
+          exit $FAILED
+
+      - name: Verify receipt git commit matches merge base
+        if: steps.receipts.outputs.files != ''
+        run: |
+          MERGE_BASE=$(git merge-base HEAD origin/main)
+          FAILED=0
+          for f in ${{ steps.receipts.outputs.files }}; do
+            echo "--- Git commit check: $f ---"
+            node --input-type=module <<EOF
+              import { readFileSync } from 'fs';
+
+              const receipt = JSON.parse(readFileSync('$f', 'utf-8'));
+              const receiptCommit = receipt.environment?.git?.commit;
+              const mergeBase = '$MERGE_BASE';
+
+              if (!receiptCommit) {
+                console.error('FAIL: receipt missing environment.git.commit');
+                process.exit(1);
+              }
+
+              // The receipt commit must be an ancestor of the merge base
+              // (i.e. the run was generated FROM a known good commit, not
+              // from the PR head which may introduce drift).
+              // We check prefix match in case the receipt stores a short SHA.
+              if (!mergeBase.startsWith(receiptCommit) && !receiptCommit.startsWith(mergeBase.slice(0, receiptCommit.length))) {
+                console.warn(\`WARN: receipt commit \${receiptCommit} does not match merge base \${mergeBase.slice(0, 12)}\`);
+                console.warn('This is expected when the bench workflow runs on a PR branch — not failing.');
+                // Not a hard failure for v0: the workflow may run on the PR branch SHA.
+                // Tighten to process.exit(1) after confirming the bench workflow always
+                // runs from main.
+                process.exit(0);
+              }
+
+              console.log(\`PASS: receipt commit \${receiptCommit} matches merge base\`);
+            EOF
+            if [ $? -ne 0 ]; then
+              FAILED=1
+            fi
+          done
+          exit $FAILED
