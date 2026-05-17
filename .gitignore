@@ -12,3 +12,7 @@ keys/*.pem
 .next/
 .vercel/
 .turbo/
+# Raw benchmark datasets — do not commit (large files, fetched on demand)
+benchmarks/data/
+**/longmemeval_s_cleaned.json
+**/locomo/
