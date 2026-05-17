@@ -12,3 +12,5 @@ keys/*.pem
 .next/
 .vercel/
 .turbo/
+
+.vercel
