@@ -7,7 +7,9 @@ import { FilterChips } from '@/components/filter-chips'
 import type { ReceiptSummary } from '@/types/receipt'
 
 export const metadata: Metadata = {
-  title: 'przm — Signed receipts for AI memory',
+  title: 'przm — Vendor-neutral AI reliability benchmarks',
+  description:
+    'Signed, reproducible, adversarial benchmarks for AI failure modes that do not have standards yet. Multi-agent convergence. Memory recall. Code review reliability.',
 }
 
 async function getReceipts(): Promise<ReceiptSummary[]> {
@@ -59,26 +61,27 @@ export default async function HomePage() {
           </div>
 
           <h1 className="mt-6 font-mono text-4xl font-semibold leading-tight tracking-tight text-[color:var(--color-text-primary)] md:text-5xl">
-            The spectrum of{' '}
+            AI{' '}
             <span className="relative" style={{ color: 'var(--color-memory)' }}>
-              AI memory
+              reliability
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute -inset-x-1 inset-y-1 -z-10 rounded-md blur-xl"
                 style={{ background: 'rgba(232,64,64,0.10)' }}
               />
-            </span>{' '}
-            performance.
+            </span>
+            , measured.
             <br />
-            Measured. Receipted. Verifiable.
+            Signed. Reproducible. Adversarial.
           </h1>
 
           <p className="mt-5 max-w-2xl font-mono text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
-            przm runs deterministic R@K and NDCG scoring against a SHA-pinned fixture &mdash; no
-            LLM anywhere in the grading loop. Every result is Ed25519-signed and committed to the
-            public audit log. Engram scored{' '}
-            <span style={{ color: 'var(--color-bench)' }}>91.9% R@10 on LoCoMo</span>. Every
-            number you see here has a receipt behind it.
+            We publish vendor-neutral benchmarks for AI failure modes that don't have standards
+            yet. Multi-agent debates that collapse to confidently wrong answers. Memory systems
+            that forget the things you need. Code review tools that miss what they should catch.
+            Deterministic scoring &mdash;{' '}
+            <span style={{ color: 'var(--color-bench)' }}>no LLM judge anywhere</span> &mdash;
+            and every result is an Ed25519-signed receipt that anyone can verify.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -105,20 +108,61 @@ export default async function HomePage() {
             </a>
           </div>
 
-          {/* Module tracker bar */}
-          <div className="mt-8 inline-flex max-w-2xl flex-wrap items-baseline gap-x-2 gap-y-1 rounded-lg border-l-2 border-[color:var(--color-bench)] bg-[color:var(--color-bg-surface)]/40 px-4 py-3 font-mono text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
-            <span style={{ color: 'var(--color-bench)' }}>&#9658;</span>
-            <span>Tracks</span>
-            <span style={{ color: 'var(--color-memory)' }}>Engram</span>
-            <span>&middot;</span>
-            <span style={{ color: 'var(--color-voice)' }}>Mem0</span>
-            <span>&middot;</span>
-            <span style={{ color: 'var(--color-knowledge)' }}>Letta</span>
-            <span>&middot;</span>
-            <span style={{ color: 'var(--color-runtime)' }}>Zep</span>
-            <span>&middot;</span>
-            <span className="text-[color:var(--color-text-secondary)]">MemPalace &middot; HippoRAG</span>
-            <span className="text-[color:var(--color-text-disabled)]">continuously.</span>
+          {/* Benchmark family tracker */}
+          <div className="mt-8 grid max-w-3xl gap-3 md:grid-cols-3">
+            <div className="rounded-lg border border-[color:var(--color-border-default)] bg-[color:var(--color-bg-surface)]/40 p-4 font-mono text-xs">
+              <div className="mb-2 flex items-center gap-2">
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{
+                    background: 'var(--color-bench)',
+                    boxShadow: '0 0 8px var(--color-bench)',
+                  }}
+                />
+                <span className="uppercase tracking-widest text-[color:var(--color-text-muted)]">
+                  v0.1 &middot; headline
+                </span>
+              </div>
+              <div className="mb-1 text-[color:var(--color-text-primary)]">
+                Multi-agent convergence
+              </div>
+              <div className="text-[color:var(--color-text-secondary)]">
+                CrewAI &middot; AutoGen &middot; LangGraph &middot; Claude Agents SDK &middot;
+                OpenAI Swarm
+              </div>
+            </div>
+            <div className="rounded-lg border border-[color:var(--color-border-default)] bg-[color:var(--color-bg-surface)]/40 p-4 font-mono text-xs">
+              <div className="mb-2 flex items-center gap-2">
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: 'var(--color-memory)' }}
+                />
+                <span className="uppercase tracking-widest text-[color:var(--color-text-muted)]">
+                  live
+                </span>
+              </div>
+              <div className="mb-1 text-[color:var(--color-text-primary)]">AI memory recall</div>
+              <div className="text-[color:var(--color-text-secondary)]">
+                Engram &middot; Mem0 &middot; Letta &middot; Zep &middot; MemPalace
+              </div>
+            </div>
+            <div className="rounded-lg border border-[color:var(--color-border-default)] bg-[color:var(--color-bg-surface)]/40 p-4 font-mono text-xs">
+              <div className="mb-2 flex items-center gap-2">
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: 'var(--color-text-disabled)' }}
+                />
+                <span className="uppercase tracking-widest text-[color:var(--color-text-muted)]">
+                  next
+                </span>
+              </div>
+              <div className="mb-1 text-[color:var(--color-text-primary)]">
+                AI code review reliability
+              </div>
+              <div className="text-[color:var(--color-text-secondary)]">
+                Snyk &middot; Semgrep &middot; CodeRabbit &middot; Cursor Security Reviewer
+              </div>
+            </div>
           </div>
         </section>
 
@@ -128,6 +172,25 @@ export default async function HomePage() {
             // Receipt ledger
           </h2>
           <FilterChips receipts={receipts} />
+        </section>
+
+        {/* For vendors */}
+        <section className="mt-20 rounded-lg border border-[color:var(--color-border-default)] bg-[color:var(--color-bg-surface)]/40 p-8">
+          <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)]">
+            // For vendors
+          </h2>
+          <p className="mt-4 max-w-3xl font-mono text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
+            If you ship an AI framework, memory system, or code-review product,
+            certify your release against przm. A signed receipt is a third-party
+            performance attestation you can put on your own website. We do not
+            sell the harness; we run the test.{' '}
+            <a
+              href="mailto:hello@onenomad.dev?subject=przm%20vendor%20certification"
+              className="text-[color:var(--color-bench)] underline-offset-4 hover:underline"
+            >
+              hello@onenomad.dev
+            </a>
+          </p>
         </section>
       </main>
       <Footer />

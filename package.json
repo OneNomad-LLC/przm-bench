@@ -34,6 +34,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.96.0",
     "@onenomad/engram-mcp": "^2.4.0",
     "better-sqlite3": "^12.10.0",
     "compromise": "^14.15.0",
