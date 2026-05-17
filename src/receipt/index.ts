@@ -10,4 +10,5 @@ export { loadPublicKey, fingerprint } from './keys.js'
 export { signReceipt } from './sign.js'
 
 export { verifyReceipt } from './verify.js'
+export { verifyConvergenceReceipt } from './verify-convergence.js'
 export type { VerifyResult } from './verify.js'
