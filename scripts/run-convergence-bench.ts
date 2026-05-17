@@ -166,6 +166,7 @@ function buildReceiptForRun(
   run: AdapterRun,
   scenarios: ConvergenceScenario[],
   ranAt: string,
+  subset: 'seen' | 'holdout' | 'all',
 ): Omit<ConvergenceReceipt, 'signature'> {
   return {
     receiptId: randomUUID(),
@@ -181,6 +182,7 @@ function buildReceiptForRun(
     fixtureSet: {
       n: scenarios.length,
       setSha256: fixtureSetSha(scenarios),
+      subset,
     },
     environment: {
       node: process.version,
@@ -241,14 +243,34 @@ function printResults(runs: AdapterRun[]): void {
 }
 
 async function main() {
+  // Subset selection via env var:
+  //   FIXTURE_SUBSET=seen     → fixtures/convergence/        (default; 24 of 30 after split)
+  //   FIXTURE_SUBSET=holdout  → fixtures/convergence-holdout/ (6 of 30, sealed)
+  //   FIXTURE_SUBSET=all      → load both dirs and merge (legacy v0.1.0 behaviour)
+  const subset = (process.env['FIXTURE_SUBSET'] ?? 'seen').toLowerCase()
+  const fixtureDirs: string[] = []
+  if (subset === 'holdout') {
+    fixtureDirs.push(join(REPO_ROOT, 'fixtures', 'convergence-holdout'))
+  } else if (subset === 'all') {
+    fixtureDirs.push(join(REPO_ROOT, 'fixtures', 'convergence'))
+    fixtureDirs.push(join(REPO_ROOT, 'fixtures', 'convergence-holdout'))
+  } else {
+    fixtureDirs.push(join(REPO_ROOT, 'fixtures', 'convergence'))
+  }
+
   const startedAt = new Date()
   console.log(`przm convergence bench — ${startedAt.toISOString()}`)
+  console.log(`Subset: ${subset}`)
   console.log(`Config: ${N_AGENTS} agents × ${N_ROUNDS} rounds per scenario.\n`)
 
-  const scenarios = await loadAllConvergenceScenarios(
-    join(REPO_ROOT, 'fixtures', 'convergence'),
-  )
-  console.log(`Loaded ${scenarios.length} scenarios.\n`)
+  const scenarios: ConvergenceScenario[] = []
+  for (const dir of fixtureDirs) {
+    const found = await loadAllConvergenceScenarios(dir)
+    // The holdout dir contains a _split-manifest.json that loadAll would
+    // try to validate as a scenario — filter it out by category check.
+    scenarios.push(...found.filter((s) => s.id && s.category))
+  }
+  console.log(`Loaded ${scenarios.length} scenarios from ${fixtureDirs.length} dir(s).\n`)
 
   const adapters: MultiAgentAdapter[] = []
 
@@ -366,9 +388,13 @@ async function main() {
       continue
     }
     try {
-      const unsigned = buildReceiptForRun(run, scenarios, ranAt)
+      const subsetForReceipt = (subset === 'holdout' || subset === 'all' ? subset : 'seen') as
+        | 'seen'
+        | 'holdout'
+        | 'all'
+      const unsigned = buildReceiptForRun(run, scenarios, ranAt, subsetForReceipt)
       const signed = signConvergenceReceipt(unsigned, privateKey)
-      const slug = `${run.adapterName}_${run.llmModel}`.replace(/[^a-z0-9_-]/gi, '-')
+      const slug = `${run.adapterName}_${run.llmModel}_${subsetForReceipt}`.replace(/[^a-z0-9_-]/gi, '-')
       const dest = join(publishDir, `${ranAt.replace(/[:.]/g, '-')}_${slug}_${signed.receiptId}.json`)
       writeFileSync(dest, JSON.stringify(signed, null, 2))
       publishedPaths.push(dest)

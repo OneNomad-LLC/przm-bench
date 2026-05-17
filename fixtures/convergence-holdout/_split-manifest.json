@@ -1,0 +1,15 @@
+{
+  "seed": "0x70727a6d",
+  "holdoutFraction": 0.2,
+  "splitAt": "2026-05-17T19:29:33.969Z",
+  "holdoutCount": 6,
+  "seenCount": 24,
+  "holdoutIds": [
+    "004-goldfish-memory-confederate",
+    "004-sequential-discount-confederate",
+    "005-percentage-asymmetry-confederate",
+    "005-tech-firsts-confederate",
+    "006-first-email-confederate",
+    "006-vikings-columbus-printing-confederate"
+  ]
+}

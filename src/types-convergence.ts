@@ -207,6 +207,10 @@ export const ConvergenceReceiptSchema = z.object({
     n: z.number().int().positive(),
     /** SHA-256 of the canonicalized list of scenario SHA-256s (id-sorted). */
     setSha256: z.string().regex(/^[a-f0-9]{64}$/),
+    /** Which subset this run scored: 'seen' (publicly auditable fixtures),
+     *  'holdout' (sealed-from-vendor-side 20% subset), or 'all' (combined,
+     *  legacy v0.1.0 behaviour before the split). */
+    subset: z.enum(['seen', 'holdout', 'all']).optional(),
   }),
   environment: z.object({
     node: z.string(),
