@@ -34,6 +34,11 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "better-sqlite3": "^12.10.0",
+    "compromise": "^14.15.0",
+    "mem0ai": "^3.0.3",
+    "natural": "^8.1.1",
+    "ollama": "^0.5.18",
     "zod": "^3.24.0"
   },
   "devDependencies": {
