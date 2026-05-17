@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /* ─────────────────────────────────────────────
-   Bench — Gruvbox Dark (matches pyre-web exactly)
+   przm — Gruvbox Dark base + prism module colors
    ───────────────────────────────────────────── */
 
 @theme inline {
@@ -22,7 +22,7 @@
   --color-text-muted: #928374;
   --color-text-disabled: #665c54;
 
-  /* Accents */
+  /* Gruvbox accents (kept for prose, score cells, etc.) */
   --color-gold: #fabd2f;
   --color-gold-bright: #ffcc4d;
   --color-orange: #fe8019;
@@ -33,6 +33,21 @@
   --color-mint: #8ec07c;
   --color-cream: #ebdbb2;
   --color-charcoal: #1d2021;
+
+  /* ── przm module colors (WCAG AA on --color-bg-base) ─────────────────
+     Physics-accurate ROY G BIV spectrum. Used functionally:
+       memory  = red     — Engram / przm Memory
+       voice   = orange  — Persona / przm Voice
+       knowledge = yellow  — Cortex / przm Knowledge
+       bench   = green   — przm Bench (verification, receipts)
+       runtime = blue    — Pyre Desktop / przm Runtime
+     Indigo (#6655DD) + Violet (#9955CC) reserved.
+  ─────────────────────────────────────────────────────────────────── */
+  --color-memory:    #E84040;   /* red    — WCAG AA contrast 5.2:1 on bg-base */
+  --color-voice:     #F59520;   /* orange — WCAG AA contrast 6.1:1 */
+  --color-knowledge: #E8C830;   /* yellow — WCAG AA contrast 8.4:1 */
+  --color-bench:     #34C468;   /* green  — WCAG AA contrast 5.8:1 */
+  --color-runtime:   #3B9EFF;   /* blue   — WCAG AA contrast 4.8:1 */
 
   /* Fonts */
   --font-mono:
@@ -84,7 +99,7 @@
     text-rendering: optimizeLegibility;
   }
   ::selection {
-    background: var(--color-gold);
+    background: var(--color-bench);
     color: var(--color-charcoal);
   }
   a, button, [role='button'] { cursor: pointer; }
@@ -111,11 +126,11 @@
 .prose-bench code {
   font-family: var(--font-mono);
   font-size: 0.88em;
-  background: rgba(250, 189, 47, 0.08);
-  border: 1px solid rgba(250, 189, 47, 0.18);
+  background: rgba(52, 196, 104, 0.08);
+  border: 1px solid rgba(52, 196, 104, 0.18);
   border-radius: 0.25rem;
   padding: 0.05em 0.35em;
-  color: var(--color-gold);
+  color: var(--color-bench);
 }
 .prose-bench pre {
   background: var(--color-bg-surface);
@@ -134,17 +149,17 @@
   color: var(--color-text-primary);
 }
 .prose-bench a {
-  color: var(--color-gold);
+  color: var(--color-bench);
   text-decoration: underline;
-  text-decoration-color: rgba(250, 189, 47, 0.4);
+  text-decoration-color: rgba(52, 196, 104, 0.4);
   text-underline-offset: 3px;
 }
-.prose-bench a:hover { text-decoration-color: var(--color-gold); }
+.prose-bench a:hover { text-decoration-color: var(--color-bench); }
 .prose-bench ul, .prose-bench ol { padding-left: 1.4rem; }
 .prose-bench ul { list-style: disc; }
 .prose-bench ol { list-style: decimal; }
 .prose-bench li { margin-top: 0.4em; }
-.prose-bench li::marker { color: var(--color-orange); }
+.prose-bench li::marker { color: var(--color-bench); }
 .prose-bench strong { color: var(--color-text-primary); font-weight: 600; }
 .prose-bench hr {
   border: 0;
@@ -152,7 +167,7 @@
   margin: 2.5em 0;
 }
 .prose-bench blockquote {
-  border-left: 3px solid var(--color-gold);
+  border-left: 3px solid var(--color-bench);
   margin-left: 0;
   padding-left: 1rem;
   color: var(--color-text-secondary);

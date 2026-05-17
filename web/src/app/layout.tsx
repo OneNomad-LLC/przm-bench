@@ -3,15 +3,15 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Bench — Signed receipts for AI memory',
-    template: '%s | Bench',
+    default: 'przm — Signed receipts for AI memory',
+    template: '%s | przm',
   },
   description:
     'Vendor-neutral, signed-receipt benchmark for AI memory servers. Deterministic scoring, public audit log, Ed25519-verified receipts. Tracks Engram, Mem0, Letta, Zep, and more.',
-  metadataBase: new URL('https://bench.onenomad.dev'),
+  metadataBase: new URL('https://bench.przm.sh'),
   openGraph: {
     type: 'website',
-    siteName: 'Bench',
+    siteName: 'przm',
   },
 }
 

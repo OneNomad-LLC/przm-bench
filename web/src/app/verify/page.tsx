@@ -7,9 +7,9 @@ import { Footer } from '@/components/footer'
 import { VerifyForm } from '@/components/verify-form'
 
 export const metadata: Metadata = {
-  title: 'Verify a receipt | Bench',
+  title: 'Verify a receipt | przm',
   description:
-    'Paste any Onenomad Bench receipt JSON and verify its Ed25519 signature in your browser — no server roundtrip.',
+    'Paste any przm bench receipt JSON and verify its Ed25519 signature in your browser — no server roundtrip.',
 }
 
 async function getPubKeyPem(): Promise<string> {
@@ -68,7 +68,7 @@ export default async function VerifyPage() {
           </pre>
           <p className="mt-3 font-mono text-xs text-[color:var(--color-text-disabled)]">
             Or programmatically:{' '}
-            <code className="text-[color:var(--color-gold)]">
+            <code className="text-[color:var(--color-bench)]">
               import {'{ verifyReceipt, loadPublicKey }'} from &apos;@onenomad/bench&apos;
             </code>
           </p>

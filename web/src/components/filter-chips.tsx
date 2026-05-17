@@ -127,8 +127,8 @@ function ChipRow({
           className={cn(
             'rounded-full border px-3 py-1 font-mono text-xs transition-colors',
             value === opt
-              ? 'border-[color:var(--color-gold)]/60 bg-[color:var(--color-gold)]/10 text-[color:var(--color-gold)]'
-              : 'border-[color:var(--color-border-default)] text-[color:var(--color-text-muted)] hover:border-[color:var(--color-gold)]/40 hover:text-[color:var(--color-text-secondary)]',
+              ? 'border-[color:var(--color-bench)]/60 bg-[color:var(--color-bench)]/10 text-[color:var(--color-bench)]'
+              : 'border-[color:var(--color-border-default)] text-[color:var(--color-text-muted)] hover:border-[color:var(--color-bench)]/40 hover:text-[color:var(--color-text-secondary)]',
           )}
         >
           {labelMap[opt] ?? opt}
