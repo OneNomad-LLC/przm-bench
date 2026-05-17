@@ -18,3 +18,4 @@ benchmarks/data/
 **/longmemeval_s_cleaned.json
 **/locomo/
 results/preview/
+src/adapters/multiagent/autogen-runner/.venv/

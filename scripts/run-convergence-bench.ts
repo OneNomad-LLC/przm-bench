@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname } from 'node:path'
 import { BaselineAnthropicAdapter } from '../src/adapters/multiagent/baseline-anthropic.js'
 import { AzureOpenAIBaselineAdapter } from '../src/adapters/multiagent/azure-openai-baseline.js'
+import { AutoGenAdapter } from '../src/adapters/multiagent/autogen.js'
 import { loadAllConvergenceScenarios } from '../src/fixtures-convergence.js'
 import { scoreScenario, aggregateConvergenceScores } from '../src/scoring/convergence.js'
 import type {
@@ -103,14 +104,16 @@ function printResults(runs: AdapterRun[]): void {
   console.log(
     '│ ' +
       'metric'.padEnd(40) +
-      runs.map((r) => r.llmModel.padStart(16)).join(' '),
+      runs
+        .map((r) => `${r.adapterName.split('-').pop()}/${r.llmModel}`.padStart(28))
+        .join(' '),
   )
   console.log('├──────────────────────────────────────────────────────────────────────────────')
   const row = (label: string, key: keyof ConvergenceScores, fmt: (n: number) => string) => {
     console.log(
       '│ ' +
         label.padEnd(40) +
-        runs.map((r) => fmt(r.scores[key]).padStart(16)).join(' '),
+        runs.map((r) => fmt(r.scores[key]).padStart(28)).join(' '),
     )
   }
   row('correct_final_answer_rate', 'correct_final_answer_rate', fmtPct)
@@ -181,6 +184,27 @@ async function main() {
     )
   } else {
     console.log('skip: AzureOpenAIBaselineAdapter (AZURE_OPENAI_* not set)')
+  }
+
+  // AutoGen RoundRobin orchestration with the same gpt-4o-mini deployment
+  // gives us a clean same-model / different-orchestration comparison.
+  if (
+    process.env['AZURE_OPENAI_ENDPOINT'] &&
+    process.env['AZURE_OPENAI_API_KEY']
+  ) {
+    adapters.push(
+      new AutoGenAdapter({
+        llmModel: 'gpt-4o-mini',
+        provider: {
+          provider: 'openai-azure',
+          config: {
+            endpoint: process.env['AZURE_OPENAI_ENDPOINT'],
+            apiKey: process.env['AZURE_OPENAI_API_KEY'],
+            deploymentName: 'gpt-4o-mini',
+          },
+        },
+      }),
+    )
   }
 
   if (adapters.length === 0) {
