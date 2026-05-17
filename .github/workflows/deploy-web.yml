@@ -1,0 +1,37 @@
+name: Deploy Web (sanity check)
+
+# Vercel's GitHub integration handles the actual deploy from main
+# automatically. This workflow is a pre-flight: confirm the web build
+# succeeds locally before Vercel picks it up.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - 'results/published/**.json'
+
+permissions:
+  contents: read
+
+jobs:
+  build-web:
+    name: web build sanity check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        run: cd web && npm ci
+
+      - name: Build web
+        run: cd web && npm run build

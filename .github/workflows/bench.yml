@@ -1,0 +1,159 @@
+name: Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      adapter:
+        description: 'Adapter name (engram, mem0, letta, zep, mempalace, hipporag)'
+        required: false
+        default: 'engram'
+        type: string
+      fixture:
+        description: 'Fixture filename without extension (e.g. longmemeval-temporal-inference-v1)'
+        required: false
+        default: 'longmemeval-temporal-inference-v1'
+        type: string
+  schedule:
+    # Nightly at 03:00 UTC
+    - cron: '0 3 * * *'
+  repository_dispatch:
+    types: [competitor-release]
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    name: Run · Sign · Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    env:
+      # Derive inputs from workflow_dispatch, repository_dispatch payload,
+      # or fall back to defaults for the schedule trigger.
+      ADAPTER: ${{ github.event.inputs.adapter || github.event.client_payload.adapter || 'engram' }}
+      FIXTURE: ${{ github.event.inputs.fixture || github.event.client_payload.fixture || 'longmemeval-temporal-inference-v1' }}
+
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run benchmark
+        run: |
+          mkdir -p tmp
+          npm run bench -- \
+            --adapter "$ADAPTER" \
+            --fixture "fixtures/$FIXTURE.json" \
+            --out tmp/receipt.json
+
+      - name: Sign receipt
+        # The private key is passed only via the env var, never via args
+        # or shell expansion. The script reads it once from process.env and
+        # never writes it to stdout/stderr. set -x is intentionally NOT used
+        # in this step — the default shell (bash -e) does not trace env vars.
+        env:
+          RECEIPT_SIGNING_PRIVATE_KEY: ${{ secrets.RECEIPT_SIGNING_PRIVATE_KEY }}
+        run: node --import tsx scripts/sign-receipt.ts
+
+      - name: Compute receipt ID and publish
+        id: publish
+        run: |
+          RECEIPT_ID=$(node -e "
+            import { readFileSync } from 'fs';
+            const r = JSON.parse(readFileSync('tmp/receipt-signed.json', 'utf-8'));
+            process.stdout.write(r.receiptId);
+          " --input-type=module)
+          echo "receipt_id=$RECEIPT_ID" >> "$GITHUB_OUTPUT"
+
+          mkdir -p results/published
+          cp tmp/receipt-signed.json "results/published/$RECEIPT_ID.json"
+          echo "receipt_path=results/published/$RECEIPT_ID.json" >> "$GITHUB_OUTPUT"
+
+      - name: Update receipts index
+        run: |
+          node --import tsx scripts/update-receipts-index.ts \
+            tmp/receipt-signed.json web/data/receipts.json
+
+      - name: Verify signature before committing
+        run: npm run verify -- "results/published/${{ steps.publish.outputs.receipt_id }}.json"
+
+      - name: Open PR with new receipt
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            bench: add receipt ${{ steps.publish.outputs.receipt_id }}
+
+            adapter=${{ env.ADAPTER }} fixture=${{ env.FIXTURE }}
+            run triggered by ${{ github.event_name }}
+          branch: receipts/${{ steps.publish.outputs.receipt_id }}
+          base: main
+          title: 'bench: ${{ env.ADAPTER }} / ${{ env.FIXTURE }} — ${{ steps.publish.outputs.receipt_id }}'
+          body: |
+            ## Benchmark receipt
+
+            | Field | Value |
+            |---|---|
+            | Receipt ID | `${{ steps.publish.outputs.receipt_id }}` |
+            | Adapter | `${{ env.ADAPTER }}` |
+            | Fixture | `${{ env.FIXTURE }}` |
+            | Triggered by | `${{ github.event_name }}` |
+            | Commit | `${{ github.sha }}` |
+
+            Receipt published at:
+            `${{ steps.publish.outputs.receipt_path }}`
+
+            Live page (once deployed):
+            https://bench.onenomad.dev/receipts/${{ steps.publish.outputs.receipt_id }}
+
+            Signature was verified by the bench workflow before this PR was opened.
+          add-paths: |
+            results/published/
+            web/data/receipts.json
+          author: Matt Stvartak <hello@mattstvartak.com>
+          committer: Matt Stvartak <hello@mattstvartak.com>
+          labels: receipt,automated
+
+      - name: Comment on PR with receipt summary
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SUMMARY=$(node --input-type=module <<'EOF'
+            import { readFileSync } from 'fs';
+            const r = JSON.parse(readFileSync('tmp/receipt-signed.json', 'utf-8'));
+            const s = r.scores;
+            const lines = [
+              '### Receipt summary',
+              '',
+              '| Metric | Value |',
+              '|---|---|',
+              `| recall@5 | ${(s.recall_at_5 * 100).toFixed(1)}% |`,
+              `| recall@10 | ${(s.recall_at_10 * 100).toFixed(1)}% |`,
+              `| ndcg@10 | ${(s.ndcg_at_10 * 100).toFixed(1)}% |`,
+              `| latency p50 | ${s.latency_p50_ms}ms |`,
+              `| latency p95 | ${s.latency_p95_ms}ms |`,
+              `| ingest throughput | ${s.ingest_throughput_items_per_sec} items/s |`,
+            ];
+            process.stdout.write(lines.join('\n'));
+          EOF
+          )
+          gh pr comment "${{ steps.cpr.outputs.pull-request-number }}" \
+            --body "$SUMMARY"
