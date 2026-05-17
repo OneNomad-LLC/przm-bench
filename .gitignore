@@ -17,3 +17,4 @@ keys/*.pem
 benchmarks/data/
 **/longmemeval_s_cleaned.json
 **/locomo/
+results/preview/
