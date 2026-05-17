@@ -34,6 +34,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@onenomad/engram-mcp": "^2.4.0",
     "zod": "^3.24.0"
   },
   "devDependencies": {
