@@ -40,7 +40,7 @@
     "mem0ai": "^3.0.3",
     "natural": "^8.1.1",
     "ollama": "^0.5.18",
-    "zod": "^3.24.0"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
