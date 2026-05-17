@@ -1,6 +1,6 @@
-# Fixtures
+﻿# Fixtures
 
-This directory contains ground-truth fixture files for `@onenomad/bench`. Every
+This directory contains ground-truth fixture files for `@onenomad/przm-bench`. Every
 file is validated against `FixtureSchema` from `src/types.ts`.
 
 ## How to validate
@@ -26,14 +26,14 @@ Exits 0 if all fixtures pass; exits 1 and prints per-field errors on failure.
 | Version | v1 (hand-curated representative subset) |
 
 **What it tests.** The temporal-reasoning category is LongMemEval's hardest for
-retrieval systems — and Mem0's documented weak spot in adversarial evaluations.
+retrieval systems â€” and Mem0's documented weak spot in adversarial evaluations.
 It covers:
 
-- **Date recall** — "When did I sign up for X?"
-- **Relative-time gaps** — "How long between event A and event B?"
-- **Before/after sequencing** — "What happened before I started my new job?"
-- **Knowledge-update ordering** — "What changed about my investment allocation?"
-- **Recency ranking** — "What was the most recent career event?"
+- **Date recall** â€” "When did I sign up for X?"
+- **Relative-time gaps** â€” "How long between event A and event B?"
+- **Before/after sequencing** â€” "What happened before I started my new job?"
+- **Knowledge-update ordering** â€” "What changed about my investment allocation?"
+- **Recency ranking** â€” "What was the most recent career event?"
 
 **Temporal structure.** All sessions span 2024-01-03 to 2024-06-25. Queries
 carry a `when` field anchoring the reference date (mostly 2024-06-30), matching
@@ -71,7 +71,7 @@ temporal-reasoning questions. To generate a full fixture from it:
 `https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned` under the MIT
 license. The original paper: *LongMemEval: Benchmarking Chat Assistants on
 Long-Term Interactive Memory* (2024). Because the source dataset is MIT-licensed,
-converted fixture data from it would be redistributable — but confirm the current
+converted fixture data from it would be redistributable â€” but confirm the current
 HuggingFace dataset card before publishing a v0.1 full-conversion fixture.
 
 ---
@@ -85,7 +85,7 @@ HuggingFace dataset card before publishing a v0.1 full-conversion fixture.
 | Items (haystack sessions) | 5002 |
 | Queries | 106 |
 | Split | Seen (80% of 133 temporal-reasoning questions) |
-| License | MIT — see `_license` field and `HOLDOUT_PROTOCOL.md` |
+| License | MIT â€” see `_license` field and `HOLDOUT_PROTOCOL.md` |
 
 **What it tests.** Full conversion of LongMemEval's `temporal-reasoning` category
 (all 133 questions, 80/20 seeded split). Each query's haystack is preserved in full
@@ -111,13 +111,13 @@ See `HOLDOUT_PROTOCOL.md` for access restrictions and publication rules.
 | Items (haystack sessions) | 1307 |
 | Queries | 27 |
 | Split | Holdout (20% of 133 temporal-reasoning questions) |
-| License | MIT — see `_license` field and `HOLDOUT_PROTOCOL.md` |
+| License | MIT â€” see `_license` field and `HOLDOUT_PROTOCOL.md` |
 
 **READ RESTRICTION.** Engineers and agents making Engram changes MUST NOT read
 the `query` fields of this fixture. See `HOLDOUT_PROTOCOL.md` for the full policy.
 
-This fixture exists so a published holdout score — run once on a tagged release —
-can be compared against the seen score. A delta within ±3pp on R@10 is the
+This fixture exists so a published holdout score â€” run once on a tagged release â€”
+can be compared against the seen score. A delta within Â±3pp on R@10 is the
 credibility signal. A delta exceeding 3pp is the published finding, not noise.
 
 ---
@@ -125,10 +125,10 @@ credibility signal. A delta exceeding 3pp is the published finding, not noise.
 ## Adding a new fixture
 
 1. Create `fixtures/<name>.json` conforming to `FixtureSchema` in `src/types.ts`.
-2. Run `npx tsx scripts/validate-fixtures.ts` — must exit 0.
+2. Run `npx tsx scripts/validate-fixtures.ts` â€” must exit 0.
 3. Add a row to this README.
 4. Commit the fixture and README together.
 
 Fixtures are append-only. Once a fixture ships in a tagged release it is never
-edited — only superseded by a new file with a bumped version suffix
+edited â€” only superseded by a new file with a bumped version suffix
 (e.g. `longmemeval-temporal-inference-v2.json`).

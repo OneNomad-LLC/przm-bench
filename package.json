@@ -1,26 +1,25 @@
 {
-  "name": "@onenomad/bench",
-  "version": "0.0.1",
-  "description": "Onenomad Bench — vendor-neutral, signed-receipt benchmark for AI memory MCP servers. Continuous tracking of Mem0, Letta, Zep, MemPalace + Engram.",
+  "name": "@onenomad/przm-bench",
+  "version": "0.1.0",
+  "description": "Reference implementation of the przm benchmark suite — multi-agent convergence, AI memory recall, and more. Vendor-neutral, signed Ed25519 receipts, deterministic scoring. Methodology canonical at https://przm.sh/methodology.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "onenomad-bench": "dist/cli.js"
+    "przm-bench": "dist/cli.js"
   },
   "files": [
     "dist",
     "fixtures",
     "keys/receipt-signing.pub",
     "README.md",
-    "METHODOLOGY.md",
     "LICENSE"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OneNomad-LLC/bench.git"
+    "url": "git+https://github.com/OneNomad-LLC/przm-bench.git"
   },
-  "homepage": "https://bench.onenomad.dev",
+  "homepage": "https://przm.sh",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=22.0.0"
@@ -48,18 +47,31 @@
     "tsx": "^4.21.0",
     "typescript": "^5.7.0"
   },
+  "overrides": {
+    "mem0ai": {
+      "@anthropic-ai/sdk": "$@anthropic-ai/sdk"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
   "keywords": [
+    "przm",
     "benchmark",
     "ai",
+    "ai-reliability",
+    "multi-agent",
+    "convergence",
+    "sycophancy",
     "memory",
     "mcp",
     "engram",
     "mem0",
     "letta",
     "zep",
+    "crewai",
+    "autogen",
+    "langgraph",
     "signed-receipts",
     "ed25519",
     "reproducible"

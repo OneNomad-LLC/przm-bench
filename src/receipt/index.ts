@@ -1,5 +1,5 @@
-/**
- * @onenomad/bench — receipt signing and verification public surface.
+﻿/**
+ * @onenomad/przm-bench â€” receipt signing and verification public surface.
  */
 
 export { canonicalize, canonicalizeToBytes } from './canonicalize.js'

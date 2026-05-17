@@ -1,16 +1,16 @@
-/**
- * Engram adapter for @onenomad/bench.
+﻿/**
+ * Engram adapter for @onenomad/przm-bench.
  *
  * Wraps @onenomad/engram-mcp@^2.4.0 via its library interface (not the MCP
  * stdio server), giving the runner direct in-process access with no spawned
  * sub-process, no stdio overhead, and deterministic teardown.
  *
- * ── LOCAL-ONLY GUARANTEES ────────────────────────────────────────────────────
+ * â”€â”€ LOCAL-ONLY GUARANTEES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  *
  * STORAGE_BACKEND=file is set unconditionally at module load.  Without this,
  * engram's storage-factory waterfall routes to Pyre Cloud whenever
  * ~/.pyre/credentials.json exists (the same gotcha documented in engram's own
- * longmemeval.ts at line 29).  Setting it here — before any engram import —
+ * longmemeval.ts at line 29).  Setting it here â€” before any engram import â€”
  * ensures every Storage instance opened during a bench run stays on-disk in
  * the instance's private temp directory.
  *
@@ -20,7 +20,7 @@
  * daily-entry side-effects (skipKgExtraction + skipDailyEntry) to match the
  * standalone bench code path and keep tests fast.
  *
- * ── EMBEDDING MODEL ─────────────────────────────────────────────────────────
+ * â”€â”€ EMBEDDING MODEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  *
  * Engram embeds with Xenova/all-MiniLM-L6-v2 by default, downloaded once to
  * ~/.cache/huggingface (or $HF_HOME).  The first call to embed() in a cold
@@ -28,19 +28,19 @@
  * SMART_MEMORY_EMBEDDING_MODEL to override.  Tests will be slow on first run
  * in a fresh environment; subsequent runs are fast (model cached).
  *
- * ── ID MAPPING ──────────────────────────────────────────────────────────────
+ * â”€â”€ ID MAPPING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  *
  * Engram assigns its own UUIDs to stored chunks (StoredChunk.id).  We
  * maintain an internal Map<engramId, originalId> so that search results can
  * be returned with the MemoryItem.id the runner expects.  The map is wiped on
  * reset().
  *
- * ── TEMPORAL QUERIES ────────────────────────────────────────────────────────
+ * â”€â”€ TEMPORAL QUERIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  *
  * When opts.when is present, it is passed as referenceDate (epoch ms) to
  * engram's search() filters.  Engram uses this to anchor relative-date
  * expressions ("3 days ago") in queries against the dataset's timeline rather
- * than wall-clock now — the same mechanism used in the standalone longmemeval
+ * than wall-clock now â€” the same mechanism used in the standalone longmemeval
  * bench (longmemeval.ts lines 306-315).
  */
 
@@ -62,7 +62,7 @@ import {
 
 import type { Adapter, MemoryItem, QueryOptions, RetrievedItem } from '../types.js';
 
-// ── Version ──────────────────────────────────────────────────────────────────
+// â”€â”€ Version â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // The @onenomad/engram-mcp package.json is not exported via its "exports"
 // field, so we cannot use `require('@onenomad/engram-mcp/package.json')` in
@@ -78,7 +78,7 @@ function _readEngramVersion(): string {
     // Walk from the resolved main entry (dist/index.js) up to the
     // package root where package.json lives.
     const entryPath: string = _require.resolve('@onenomad/engram-mcp');
-    // dist/index.js → package root is two levels up (dist/ → pkg root)
+    // dist/index.js â†’ package root is two levels up (dist/ â†’ pkg root)
     const pkgRoot = dirname(dirname(entryPath));
     const raw = readFileSync(join(pkgRoot, 'package.json'), 'utf-8');
     const parsed = JSON.parse(raw) as { version?: unknown };
@@ -91,7 +91,7 @@ function _readEngramVersion(): string {
 
 const _engramVersion: string = _readEngramVersion();
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function makeTempDir(): string {
   const dir = join(tmpdir(), `bench-engram-${Date.now()}-${Math.random().toString(36).slice(2)}`);
@@ -99,7 +99,7 @@ function makeTempDir(): string {
   return dir;
 }
 
-// ── Adapter ──────────────────────────────────────────────────────────────────
+// â”€â”€ Adapter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export class EngramAdapter implements Adapter {
   readonly name = 'engram';
@@ -110,7 +110,7 @@ export class EngramAdapter implements Adapter {
   private storage: Storage | null = null;
 
   /**
-   * Map from engram's internal chunk UUID → the original MemoryItem.id we
+   * Map from engram's internal chunk UUID â†’ the original MemoryItem.id we
    * were given at ingest time.  Reset on reset().
    */
   private idMap = new Map<string, string>();
@@ -120,7 +120,7 @@ export class EngramAdapter implements Adapter {
     this.dataDir = opts?.dataDir ?? makeTempDir();
   }
 
-  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  // â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   private async ensureStorage(): Promise<Storage> {
     if (this.storage) return this.storage;
@@ -131,7 +131,7 @@ export class EngramAdapter implements Adapter {
   }
 
   async reset(): Promise<void> {
-    // Nullify the storage reference before wiping the directory — the
+    // Nullify the storage reference before wiping the directory â€” the
     // FileStorageAdapter (LanceDB) holds file handles; let GC close them
     // before rmSync tries to unlink.  We yield once to give the GC a
     // chance, then proceed.  The same pattern is used in engram's own
@@ -167,7 +167,7 @@ export class EngramAdapter implements Adapter {
     }
   }
 
-  // ── Ingest ────────────────────────────────────────────────────────────────
+  // â”€â”€ Ingest â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async ingest(items: MemoryItem[]): Promise<void> {
     if (items.length === 0) return;
@@ -189,7 +189,7 @@ export class EngramAdapter implements Adapter {
           // retrieval benchmarking.
           skipKgExtraction: true,
           skipDailyEntry: true,
-          // Await side-effects synchronously — we will query immediately
+          // Await side-effects synchronously â€” we will query immediately
           // after ingesting the full fixture.
           awaitSideEffects: true,
         },
@@ -202,7 +202,7 @@ export class EngramAdapter implements Adapter {
     }
   }
 
-  // ── Query ─────────────────────────────────────────────────────────────────
+  // â”€â”€ Query â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async query(q: string, opts: QueryOptions): Promise<RetrievedItem[]> {
     const storage = await this.ensureStorage();
@@ -230,7 +230,7 @@ export class EngramAdapter implements Adapter {
       // Resolve to the original MemoryItem.id.  Fall back to the engram
       // chunk ID if the mapping is missing (shouldn't happen in practice,
       // but avoids a throw if engram returns a chunk we didn't ingest via
-      // this adapter — e.g. a stub from source-dedup).
+      // this adapter â€” e.g. a stub from source-dedup).
       const originalId = this.idMap.get(r.chunk.id) ?? r.chunk.id;
 
       retrieved.push({

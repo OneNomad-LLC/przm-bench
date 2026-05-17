@@ -1,5 +1,5 @@
-/**
- * @onenomad/bench — public API surface.
+﻿/**
+ * @onenomad/przm-bench â€” public API surface.
  *
  * Import this package to run benchmarks programmatically or to build
  * custom adapters and fixtures.
@@ -13,20 +13,20 @@
  *   export * from './receipt/index.js'
  */
 
-// ── Runner ────────────────────────────────────────────────────────────
+// â”€â”€ Runner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export { runBenchmark } from './runner.js'
 export type { RunBenchmarkOptions, RunBenchmarkResult } from './runner.js'
 
-// ── Fixtures ──────────────────────────────────────────────────────────
+// â”€â”€ Fixtures â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export { loadFixture, loadFixturesDir, loadFixtureSync, hashFixture } from './fixtures.js'
 
-// ── Scoring ───────────────────────────────────────────────────────────
+// â”€â”€ Scoring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export { recallAtK } from './scoring/recall.js'
 export { ndcgAtK } from './scoring/ndcg.js'
 export { percentile } from './scoring/latency.js'
 export { aggregateScores } from './scoring/aggregate.js'
 
-// ── Types (re-export everything from types.ts) ────────────────────────
+// â”€â”€ Types (re-export everything from types.ts) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export type {
   MemoryItem,
   RetrievedItem,

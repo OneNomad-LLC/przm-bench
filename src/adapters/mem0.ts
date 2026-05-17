@@ -1,14 +1,14 @@
-/**
- * Mem0 adapter for @onenomad/bench
+﻿/**
+ * Mem0 adapter for @onenomad/przm-bench
  *
- * Implementation path chosen: A — mem0ai JS SDK in local mode (no hosted API,
+ * Implementation path chosen: A â€” mem0ai JS SDK in local mode (no hosted API,
  * no API key).
  *
  * How it works:
  *   - Uses `mem0ai/oss` (the open-source Memory class), NOT the hosted MemoryClient.
- *   - Vector store: MemoryVectorStore — in-process SQLite-backed cosine store,
+ *   - Vector store: MemoryVectorStore â€” in-process SQLite-backed cosine store,
  *     zero external services.
- *   - Embedder: OllamaEmbedder — calls a locally-running Ollama server.
+ *   - Embedder: OllamaEmbedder â€” calls a locally-running Ollama server.
  *     Default model: nomic-embed-text (384-dim). Pull it once with:
  *       ollama pull nomic-embed-text
  *   - LLM: NOT used. add() is called with infer: false, which bypasses the LLM
@@ -22,7 +22,7 @@
  *   1. Ollama installed and running: https://ollama.com
  *   2. Embedding model pulled:  ollama pull nomic-embed-text
  *      (or set MEM0_OLLAMA_MODEL env var to a different model and update
- *       MEM0_EMBED_DIMS accordingly — default is 768 for nomic-embed-text)
+ *       MEM0_EMBED_DIMS accordingly â€” default is 768 for nomic-embed-text)
  *
  * Why not Path B (Python subprocess) or Path C (HTTP server)?
  *   The JS SDK's OSS surface is complete: MemoryVectorStore provides a
@@ -49,21 +49,21 @@ import fs from 'node:fs'
 import { Memory, MemoryVectorStore, OllamaEmbedder } from 'mem0ai/oss'
 import type { Adapter, MemoryItem, QueryOptions, RetrievedItem } from '../types.js'
 
-// ── Constants ────────────────────────────────────────────────────────────────
+// â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const BENCH_USER_ID = 'bench'
 
 /**
  * Env overrides:
- *   MEM0_OLLAMA_BASE_URL  — Ollama HTTP base URL (default: http://localhost:11434)
- *   MEM0_OLLAMA_MODEL     — embedding model name   (default: nomic-embed-text)
- *   MEM0_EMBED_DIMS       — embedding dimension    (default: 768)
+ *   MEM0_OLLAMA_BASE_URL  â€” Ollama HTTP base URL (default: http://localhost:11434)
+ *   MEM0_OLLAMA_MODEL     â€” embedding model name   (default: nomic-embed-text)
+ *   MEM0_EMBED_DIMS       â€” embedding dimension    (default: 768)
  */
 const OLLAMA_BASE_URL = process.env['MEM0_OLLAMA_BASE_URL'] ?? 'http://localhost:11434'
 const OLLAMA_MODEL = process.env['MEM0_OLLAMA_MODEL'] ?? 'nomic-embed-text'
 const EMBED_DIMS = Number(process.env['MEM0_EMBED_DIMS'] ?? '768')
 
-// ── Mem0Adapter ──────────────────────────────────────────────────────────────
+// â”€â”€ Mem0Adapter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export class Mem0Adapter implements Adapter {
   readonly name = 'mem0'
@@ -73,7 +73,7 @@ export class Mem0Adapter implements Adapter {
   private mem0: Memory | null = null
 
   /**
-   * Maps mem0-internal UUID → bench MemoryItem.id.
+   * Maps mem0-internal UUID â†’ bench MemoryItem.id.
    * Populated during ingest(); used to translate search results back.
    */
   private idMap: Map<string, string> = new Map()
@@ -95,7 +95,7 @@ export class Mem0Adapter implements Adapter {
     `mem0-bench-vector-${Date.now()}.db`,
   )
 
-  // ── Private helpers ────────────────────────────────────────────────────────
+  // â”€â”€ Private helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /** Build a fresh Memory instance wired to local-only components. */
   private buildMemory(): Memory {
@@ -119,7 +119,7 @@ export class Mem0Adapter implements Adapter {
         },
       },
       // LLM config is provided but never invoked because every add() call
-      // passes infer: false. We set an empty apiKey — if infer is ever
+      // passes infer: false. We set an empty apiKey â€” if infer is ever
       // accidentally enabled, the OpenAI call will fail loudly rather than
       // silently doing the wrong thing.
       llm: {
@@ -158,14 +158,14 @@ export class Mem0Adapter implements Adapter {
     }
   }
 
-  // ── Adapter contract ───────────────────────────────────────────────────────
+  // â”€â”€ Adapter contract â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async ingest(items: MemoryItem[]): Promise<void> {
     const mem = this.ensureMem0()
     this.idMap.clear()
 
     for (const item of items) {
-      // infer: false — bypasses LLM, stores the content verbatim.
+      // infer: false â€” bypasses LLM, stores the content verbatim.
       // Bench ID travels in metadata.bench_id so we can recover it from
       // search results even without the in-memory map (for robustness).
       const result = await mem.add(

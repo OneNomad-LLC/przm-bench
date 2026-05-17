@@ -1,34 +1,40 @@
-# Onenomad Bench
+# przm-bench
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%E2%89%A522-brightgreen.svg)](package.json)
 
-**Vendor-neutral, signed-receipt benchmark for AI memory servers.**
+**Reference implementation of the [przm](https://przm.sh) benchmark
+suite.** Vendor-neutral, Ed25519-signed, deterministic.
 
-Every benchmark run produces an Ed25519-signed JSON receipt with the
-full methodology, container image hash, fixture SHA, raw results, and
+Tracks the AI failure modes that don't have standards yet:
+
+- **Multi-agent convergence** — how fast CrewAI / AutoGen / LangGraph /
+  Claude Agents SDK / OpenAI Swarm collapse to a confidently-stated
+  wrong answer when one agent is confederate-injected.
+- **AI memory recall** — Engram · Mem0 · Letta · Zep · MemPalace ·
+  HippoRAG on LongMemEval temporal-inference and LoCoMo, with seen +
+  20% holdout splits.
+
+Every benchmark run produces a signed JSON receipt with the full
+methodology, container image hash, fixture SHA, raw results, and
 public verification key. Every receipt is published at
-[bench.onenomad.dev](https://bench.onenomad.dev) and committed to this
-repo under `results/published/`. Anyone can re-run, anyone can verify.
-
-Tracks **Engram · Mem0 · Letta · Zep · MemPalace · HippoRAG** continuously.
+[przm.sh](https://przm.sh) and committed to this repo under
+`results/published/`. Anyone can re-run, anyone can verify.
 
 ---
 
-## Why this exists
+## Methodology
 
-The state of AI-memory benchmarking is bad. LLM-as-judge graders that
-generate-then-grade are not third-party verifications, they're vibes
-with extra steps. Self-reported numbers from vendors who own the
-benchmark and the harness are not falsifiable. Adversarial questions
-that drop from the published subset between releases are not honest.
+The canonical methodology specs live at
+**<https://przm.sh/methodology>**.
 
-Onenomad Bench fixes this. Deterministic scoring (R@K, NDCG, latency
-p50/p95, ingest throughput). No LLM judge anywhere in the loop. Every
-run signed, every receipt public, every fixture in-repo.
+This repo is the *reference implementation* of those specs. When the
+spec changes, it changes at `przm.sh` first; this repo catches up.
+That's the standards-track pattern (IETF, MLPerf, SPEC) — the spec is
+the product, the runner implements the spec.
 
-The competitive landscape doesn't need another memory product. It needs
-a measuring stick nobody owns.
+Spec markdown lives in
+[OneNomad-LLC/przm-web/content](https://github.com/OneNomad-LLC/przm-web/tree/main/content).
 
 ---
 
@@ -37,13 +43,13 @@ a measuring stick nobody owns.
 Verify any receipt from this repo against the public key:
 
 ```bash
-npx @onenomad/bench verify results/published/<receipt-id>.json
+npx @onenomad/przm-bench verify results/published/<receipt-id>.json
 ```
 
 Or programmatically:
 
 ```typescript
-import { verifyReceipt, loadPublicKey } from '@onenomad/bench'
+import { verifyReceipt, loadPublicKey } from '@onenomad/przm-bench'
 
 const pubKey = await loadPublicKey('keys/receipt-signing.pub')
 const receipt = JSON.parse(readFileSync('receipt.json', 'utf-8'))
@@ -52,41 +58,33 @@ const ok = verifyReceipt(receipt, pubKey)
 
 ---
 
-## Methodology
-
-See [METHODOLOGY.md](METHODOLOGY.md). Highlights:
-
-- **Deterministic scoring only.** No LLM in the grading loop. R@K, NDCG,
-  latency, throughput.
-- **Reproducible.** Run from a tagged commit, fixed container image
-  hash, pinned fixture SHA. Two runs produce byte-identical receipts.
-- **Vendor-neutral adapter pattern.** Each memory system has an adapter
-  in `src/adapters/<name>.ts`. Adding a new one is one file.
-- **Adversarial.** We re-run every competitor on every release. Public
-  audit log shows every run, including the ones where Engram lost.
-
----
-
 ## Repository layout
 
 ```
-bench/
+przm-bench/
 ├── src/
-│   ├── adapters/            # Memory-system adapters (engram, mem0, letta, ...)
+│   ├── adapters/
+│   │   ├── multiagent/      # Convergence adapters (baseline, CrewAI, AutoGen, ...)
+│   │   ├── engram.ts        # Memory adapter
+│   │   ├── mem0.ts          # Memory adapter
+│   │   └── ...
 │   ├── receipt/             # Ed25519 sign/verify, JSON schema
 │   ├── scoring/             # Pure scoring functions per metric
 │   ├── runner.ts            # Iterates fixtures across adapters
-│   ├── fixtures.ts          # JSON fixture loader + Zod validation
-│   ├── cli.ts               # `onenomad-bench` command
-│   └── types.ts             # Adapter contract, fixture schema, receipt schema
-├── fixtures/                # Test datasets (LongMemEval temporal-inference, LoCoMo, ...)
+│   ├── fixtures.ts          # Memory-benchmark fixture loader
+│   ├── fixtures-convergence.ts # Convergence-benchmark fixture loader
+│   ├── cli.ts               # `przm-bench` command
+│   ├── types.ts             # Memory adapter contract + receipt schema
+│   └── types-convergence.ts # MultiAgentAdapter + DebateTranscript
+├── fixtures/
+│   ├── longmemeval/         # Memory benchmark fixtures
+│   ├── locomo/              # Memory benchmark fixtures
+│   └── convergence/         # Convergence scenarios across 5 categories
 ├── results/
 │   └── published/           # Committed signed receipts (the public record)
 ├── keys/
 │   └── receipt-signing.pub  # Ed25519 public key (private key is GitHub secret)
-├── web/                     # Next.js site for bench.onenomad.dev
 ├── .github/workflows/       # CI: run + sign + commit + deploy
-├── METHODOLOGY.md
 ├── CHANGELOG.md
 └── LICENSE                  # Apache-2.0
 ```
@@ -98,4 +96,4 @@ bench/
 [Apache-2.0](LICENSE). Fixtures included. Re-use the harness, the
 fixtures, the receipt format — just keep attribution.
 
-Issues + PRs at <https://github.com/OneNomad-LLC/bench>.
+Issues + PRs at <https://github.com/OneNomad-LLC/przm-bench>.

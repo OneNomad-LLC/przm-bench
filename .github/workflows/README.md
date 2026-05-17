@@ -1,6 +1,6 @@
-# Workflows runbook
+﻿# Workflows runbook
 
-## bench.yml — Run · Sign · Publish
+## bench.yml â€” Run Â· Sign Â· Publish
 
 Produces a signed receipt and opens a PR to commit it.
 
@@ -50,25 +50,25 @@ gh workflow run bench.yml \
 
 ---
 
-## verify-pr.yml — Signature + SHA + Environment checks
+## verify-pr.yml â€” Signature + SHA + Environment checks
 
 Runs on every PR that touches `results/published/` or `web/data/receipts.json`.
 
 **Checks**
 
 1. Signature verification via `npm run verify` against `keys/receipt-signing.pub`.
-2. Fixture SHA-256: the `fixture.sha256` in the receipt must match the actual fixture file (skips with a warning if the fixture isn't present yet — expected while other tracks are in flight).
+2. Fixture SHA-256: the `fixture.sha256` in the receipt must match the actual fixture file (skips with a warning if the fixture isn't present yet â€” expected while other tracks are in flight).
 3. Git commit cross-reference: the receipt's `environment.git.commit` is compared against the PR merge base. Currently a warning for v0; tighten to hard fail after confirming the bench workflow always runs from main.
 
 **Blocks merge on**: signature failure, SHA mismatch (when fixture file is present).
 
 ---
 
-## deploy-web.yml — Web build sanity check
+## deploy-web.yml â€” Web build sanity check
 
 Runs on push to `main` when `web/**` or `results/published/**` change.
 
-Vercel's GitHub integration handles the actual deploy. This workflow is purely a local build gate — `cd web && npm ci && npm run build` — so a broken web build is caught before Vercel queues it.
+Vercel's GitHub integration handles the actual deploy. This workflow is purely a local build gate â€” `cd web && npm ci && npm run build` â€” so a broken web build is caught before Vercel queues it.
 
 **No secrets required.** Vercel's integration is configured separately in the Vercel dashboard (connect repo, set `main` as production branch).
 
@@ -95,7 +95,7 @@ Receipts signed before the rotation remain valid against the old public key. Rec
 ## Triggering via repository_dispatch (competitor release webhook)
 
 ```bash
-gh api repos/OneNomad-LLC/bench/dispatches \
+gh api repos/OneNomad-LLC/przm-bench/dispatches \
   --method POST \
   --field event_type=competitor-release \
   --field client_payload[adapter]=mem0 \
