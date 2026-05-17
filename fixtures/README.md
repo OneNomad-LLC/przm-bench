@@ -76,6 +76,52 @@ HuggingFace dataset card before publishing a v0.1 full-conversion fixture.
 
 ---
 
+### `longmemeval-temporal-inference-full-seen.json`
+
+| Property | Value |
+|----------|-------|
+| Benchmark | LongMemEval |
+| Subset | temporal-inference |
+| Items (haystack sessions) | 5002 |
+| Queries | 106 |
+| Split | Seen (80% of 133 temporal-reasoning questions) |
+| License | MIT — see `_license` field and `HOLDOUT_PROTOCOL.md` |
+
+**What it tests.** Full conversion of LongMemEval's `temporal-reasoning` category
+(all 133 questions, 80/20 seeded split). Each query's haystack is preserved in full
+(~47 sessions per question, with non-answer sessions as distractors). Tests the
+same temporal-inference dimensions as v1 but at dataset scale with real conversation
+haystacks from the source dataset.
+
+**Regenerating this fixture.** Run `npx tsx scripts/build-longmemeval-holdout.ts`
+with the source dataset at `$LME_DATA_PATH` or `../engram/benchmarks/data/longmemeval_s_cleaned.json`.
+See `scripts/build-longmemeval-holdout.ts` for full documentation and seed derivation.
+
+**Holdout.** The 20% split is in `longmemeval-temporal-inference-full-holdout.json`.
+See `HOLDOUT_PROTOCOL.md` for access restrictions and publication rules.
+
+---
+
+### `longmemeval-temporal-inference-full-holdout.json`
+
+| Property | Value |
+|----------|-------|
+| Benchmark | LongMemEval |
+| Subset | temporal-inference |
+| Items (haystack sessions) | 1307 |
+| Queries | 27 |
+| Split | Holdout (20% of 133 temporal-reasoning questions) |
+| License | MIT — see `_license` field and `HOLDOUT_PROTOCOL.md` |
+
+**READ RESTRICTION.** Engineers and agents making Engram changes MUST NOT read
+the `query` fields of this fixture. See `HOLDOUT_PROTOCOL.md` for the full policy.
+
+This fixture exists so a published holdout score — run once on a tagged release —
+can be compared against the seen score. A delta within ±3pp on R@10 is the
+credibility signal. A delta exceeding 3pp is the published finding, not noise.
+
+---
+
 ## Adding a new fixture
 
 1. Create `fixtures/<name>.json` conforming to `FixtureSchema` in `src/types.ts`.
