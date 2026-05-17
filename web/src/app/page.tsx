@@ -7,7 +7,7 @@ import { FilterChips } from '@/components/filter-chips'
 import type { ReceiptSummary } from '@/types/receipt'
 
 export const metadata: Metadata = {
-  title: 'Bench — Signed receipts for AI memory',
+  title: 'przm — Signed receipts for AI memory',
 }
 
 async function getReceipts(): Promise<ReceiptSummary[]> {
@@ -42,12 +42,12 @@ export default async function HomePage() {
           <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
             <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border-default)] bg-[color:var(--color-bg-surface)]/60 px-3 py-1 text-[color:var(--color-text-secondary)]">
               <span
-                className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-green)]"
-                style={{ boxShadow: '0 0 8px var(--color-green)' }}
+                className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-bench)]"
+                style={{ boxShadow: '0 0 8px var(--color-bench)' }}
               />
               Ed25519-signed receipts
             </span>
-            <span className="rounded-full border border-[color:var(--color-gold)]/30 bg-[color:var(--color-gold)]/10 px-3 py-1 text-[color:var(--color-gold)]">
+            <span className="rounded-full border border-[color:var(--color-bench)]/30 bg-[color:var(--color-bench)]/10 px-3 py-1 text-[color:var(--color-bench)]">
               Apache 2.0
             </span>
             <span className="rounded-full border border-[color:var(--color-border-default)] bg-[color:var(--color-bg-surface)]/60 px-3 py-1 text-[color:var(--color-text-secondary)]">
@@ -59,24 +59,26 @@ export default async function HomePage() {
           </div>
 
           <h1 className="mt-6 font-mono text-4xl font-semibold leading-tight tracking-tight text-[color:var(--color-text-primary)] md:text-5xl">
-            Signed receipts for{' '}
-            <span className="relative text-[color:var(--color-gold)]">
+            The spectrum of{' '}
+            <span className="relative" style={{ color: 'var(--color-memory)' }}>
               AI memory
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute -inset-x-1 inset-y-1 -z-10 rounded-md blur-xl"
-                style={{ background: 'rgba(250,189,47,0.12)' }}
+                style={{ background: 'rgba(232,64,64,0.10)' }}
               />
-            </span>
-            .
+            </span>{' '}
+            performance.
             <br />
-            Every benchmark. Every release.
+            Measured. Receipted. Verifiable.
           </h1>
 
           <p className="mt-5 max-w-2xl font-mono text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
-            Vendor-neutral, Ed25519-signed benchmark receipts. Deterministic R@K and NDCG scoring
-            &mdash; no LLM anywhere in the grading loop. Every receipt is committed to the public
-            audit log and verifiable against the public key in-repo.
+            przm runs deterministic R@K and NDCG scoring against a SHA-pinned fixture &mdash; no
+            LLM anywhere in the grading loop. Every result is Ed25519-signed and committed to the
+            public audit log. Engram scored{' '}
+            <span style={{ color: 'var(--color-bench)' }}>91.9% R@10 on LoCoMo</span>. Every
+            number you see here has a receipt behind it.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -84,35 +86,36 @@ export default async function HomePage() {
               href="https://github.com/OneNomad-LLC/bench"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-gold)] px-5 py-2.5 font-mono text-xs font-semibold text-[color:var(--color-charcoal)] transition-colors hover:bg-[color:var(--color-gold-bright)]"
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-mono text-xs font-semibold text-[color:var(--color-charcoal)] transition-colors"
+              style={{ background: 'var(--color-bench)' }}
             >
               View on GitHub &rarr;
             </a>
             <a
               href="/methodology"
-              className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border-default)] px-5 py-2.5 font-mono text-xs text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-gold)] hover:text-[color:var(--color-gold)]"
+              className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border-default)] px-5 py-2.5 font-mono text-xs text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-bench)] hover:text-[color:var(--color-bench)]"
             >
               Methodology
             </a>
             <a
               href="/verify"
-              className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border-default)] px-5 py-2.5 font-mono text-xs text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-gold)] hover:text-[color:var(--color-gold)]"
+              className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border-default)] px-5 py-2.5 font-mono text-xs text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-bench)] hover:text-[color:var(--color-bench)]"
             >
               Verify a receipt
             </a>
           </div>
 
-          {/* Tagline bar */}
-          <div className="mt-8 inline-flex max-w-2xl flex-wrap items-baseline gap-x-2 gap-y-1 rounded-lg border-l-2 border-[color:var(--color-orange)] bg-[color:var(--color-bg-surface)]/40 px-4 py-3 font-mono text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
-            <span className="text-[color:var(--color-orange)]">&#9658;</span>
+          {/* Module tracker bar */}
+          <div className="mt-8 inline-flex max-w-2xl flex-wrap items-baseline gap-x-2 gap-y-1 rounded-lg border-l-2 border-[color:var(--color-bench)] bg-[color:var(--color-bg-surface)]/40 px-4 py-3 font-mono text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
+            <span style={{ color: 'var(--color-bench)' }}>&#9658;</span>
             <span>Tracks</span>
-            <span className="text-[color:var(--color-aqua)]">Engram</span>
+            <span style={{ color: 'var(--color-memory)' }}>Engram</span>
             <span>&middot;</span>
-            <span className="text-[color:var(--color-purple)]">Mem0</span>
+            <span style={{ color: 'var(--color-voice)' }}>Mem0</span>
             <span>&middot;</span>
-            <span className="text-[color:var(--color-mint)]">Letta</span>
+            <span style={{ color: 'var(--color-knowledge)' }}>Letta</span>
             <span>&middot;</span>
-            <span className="text-[color:var(--color-orange)]">Zep</span>
+            <span style={{ color: 'var(--color-runtime)' }}>Zep</span>
             <span>&middot;</span>
             <span className="text-[color:var(--color-text-secondary)]">MemPalace &middot; HippoRAG</span>
             <span className="text-[color:var(--color-text-disabled)]">continuously.</span>

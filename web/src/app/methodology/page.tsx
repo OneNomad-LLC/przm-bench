@@ -6,9 +6,9 @@ import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 
 export const metadata: Metadata = {
-  title: 'Methodology | Bench',
+  title: 'Methodology | przm',
   description:
-    'How Onenomad Bench scores a memory system: deterministic R@K and NDCG, Ed25519 signing, fixture SHA pinning, and full reproducibility spec.',
+    'How przm scores a memory system: deterministic R@K and NDCG, Ed25519 signing, fixture SHA pinning, and full reproducibility spec.',
 }
 
 async function getMethodologyHtml(): Promise<string> {
@@ -52,7 +52,7 @@ export default async function MethodologyPage() {
             >
               METHODOLOGY.md
             </a>{' '}
-            in the bench repo &middot; Apache-2.0
+            in the przm bench repo &middot; Apache-2.0
           </p>
           <a
             href="/verify"

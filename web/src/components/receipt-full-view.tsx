@@ -73,7 +73,7 @@ export function ReceiptFullView({ receipt, pubKeyPem }: ReceiptFullViewProps) {
           )}
           <button
             onClick={handleDownload}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-border-default)] px-3 py-1.5 font-mono text-xs text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-gold)] hover:text-[color:var(--color-gold)]"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-border-default)] px-3 py-1.5 font-mono text-xs text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-bench)] hover:text-[color:var(--color-bench)]"
           >
             <Download size={12} />
             Raw JSON
@@ -87,24 +87,24 @@ export function ReceiptFullView({ receipt, pubKeyPem }: ReceiptFullViewProps) {
           value={fmtPct(receipt.scores.recall_at_5)}
           label="Recall @ 5"
           sub={`n=${receipt.fixture.n}`}
-          accent="gold"
+          accent="green"
         />
         <ScoreNumber
           value={fmtPct(receipt.scores.recall_at_10)}
           label="Recall @ 10"
           sub={`n=${receipt.fixture.n}`}
-          accent="gold"
+          accent="green"
         />
         <ScoreNumber
           value={fmtPct(receipt.scores.ndcg_at_10)}
           label="NDCG @ 10"
-          accent="orange"
+          accent="red"
         />
         <ScoreNumber
           value={fmtMs(receipt.scores.latency_p50_ms)}
           label="Latency p50"
           sub={`p95: ${fmtMs(receipt.scores.latency_p95_ms)}`}
-          accent="orange"
+          accent="red"
         />
       </div>
 
@@ -112,7 +112,7 @@ export function ReceiptFullView({ receipt, pubKeyPem }: ReceiptFullViewProps) {
         <ScoreNumber
           value={fmtThroughput(receipt.scores.ingest_throughput_items_per_sec)}
           label="Ingest throughput"
-          accent="gold"
+          accent="green"
         />
       </div>
 
@@ -137,7 +137,7 @@ export function ReceiptFullView({ receipt, pubKeyPem }: ReceiptFullViewProps) {
               href={ghCommitUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-xs text-[color:var(--color-gold)] transition-colors hover:text-[color:var(--color-gold-bright)]"
+              className="font-mono text-xs text-[color:var(--color-bench)] transition-colors hover:text-[color:var(--color-bench)]"
             >
               {shortSha(receipt.environment.git.commit)}
               {receipt.environment.git.dirty && ' (dirty)'}
@@ -184,7 +184,7 @@ export function ReceiptFullView({ receipt, pubKeyPem }: ReceiptFullViewProps) {
               href={auditUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-xs text-[color:var(--color-gold)] transition-colors hover:text-[color:var(--color-gold-bright)]"
+              className="font-mono text-xs text-[color:var(--color-bench)] transition-colors hover:text-[color:var(--color-bench)]"
             >
               results/published/{receipt.receiptId.slice(0, 8)}&hellip;.json
             </a>
@@ -213,7 +213,7 @@ export function ReceiptFullView({ receipt, pubKeyPem }: ReceiptFullViewProps) {
         <section className="mt-12">
           <button
             onClick={() => setTableOpen((v) => !v)}
-            className="flex w-full items-center justify-between rounded-lg border border-[color:var(--color-border-default)] bg-[color:var(--color-bg-surface)] px-5 py-4 text-left transition-colors hover:border-[color:var(--color-gold)]/40"
+            className="flex w-full items-center justify-between rounded-lg border border-[color:var(--color-border-default)] bg-[color:var(--color-bg-surface)] px-5 py-4 text-left transition-colors hover:border-[color:var(--color-bench)]/40"
           >
             <span className="font-mono text-sm font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)]">
               Per-query results ({receipt.perQuery.length} queries)

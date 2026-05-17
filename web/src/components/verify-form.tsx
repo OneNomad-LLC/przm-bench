@@ -114,7 +114,7 @@ export function VerifyForm({ pubKeyPem, pubKeyFingerprint }: VerifyFormProps) {
             href="https://github.com/OneNomad-LLC/bench/blob/main/keys/receipt-signing.pub"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[color:var(--color-gold)] hover:underline"
+            className="text-[color:var(--color-bench)] hover:underline"
           >
             github.com/OneNomad-LLC/bench
           </a>
@@ -147,10 +147,11 @@ export function VerifyForm({ pubKeyPem, pubKeyFingerprint }: VerifyFormProps) {
       <button
         onClick={handleVerify}
         disabled={!json.trim() || loading}
+        style={json.trim() && !loading ? { background: 'var(--color-bench)' } : undefined}
         className={cn(
           'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-mono text-sm font-medium transition-all',
           json.trim() && !loading
-            ? 'bg-[color:var(--color-gold)] text-[color:var(--color-charcoal)] hover:bg-[color:var(--color-gold-bright)]'
+            ? 'text-[color:var(--color-charcoal)]'
             : 'cursor-not-allowed bg-[color:var(--color-bg-raised)] text-[color:var(--color-text-disabled)]',
         )}
       >
@@ -174,7 +175,7 @@ function VerifyResultBanner({ result }: { result: VerifyResult }) {
             Signature verified
           </p>
           <p className="mt-1 font-mono text-xs text-[color:var(--color-text-secondary)]">
-            The receipt is authentic and was signed with the Onenomad Bench private key. Scores have
+            The receipt is authentic and was signed with the przm bench private key. Scores have
             not been altered.
           </p>
         </div>

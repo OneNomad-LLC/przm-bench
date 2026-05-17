@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
+import { Logo } from '@/components/logo'
 import { cn } from '@/lib/utils'
 
 const navLinks = [
@@ -40,9 +41,10 @@ export function Navbar() {
           className="flex shrink-0 items-center gap-2 font-mono text-sm font-semibold tracking-tight text-[color:var(--color-text-primary)]"
           onClick={() => setMobileOpen(false)}
         >
-          <span className="text-[color:var(--color-gold)]">bench</span>
+          <Logo size={18} />
+          <span className="text-[color:var(--color-text-primary)]">przm</span>
           <span className="text-[color:var(--color-text-disabled)]">/</span>
-          <span className="text-[color:var(--color-text-muted)] text-xs">onenomad</span>
+          <span className="text-[color:var(--color-bench)] text-xs">bench</span>
         </Link>
 
         {/* Desktop nav */}
@@ -53,8 +55,8 @@ export function Navbar() {
                 href={l.href}
                 aria-current={isActive(pathname, l.href) ? 'page' : undefined}
                 className={cn(
-                  'transition-colors hover:text-[color:var(--color-gold)]',
-                  isActive(pathname, l.href) && 'text-[color:var(--color-gold)]',
+                  'transition-colors hover:text-[color:var(--color-bench)]',
+                  isActive(pathname, l.href) && 'text-[color:var(--color-bench)]',
                 )}
               >
                 {l.label}
@@ -66,7 +68,7 @@ export function Navbar() {
               href="https://github.com/OneNomad-LLC/bench"
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-[color:var(--color-gold)]"
+              className="transition-colors hover:text-[color:var(--color-bench)]"
             >
               GitHub
             </a>
@@ -79,7 +81,7 @@ export function Navbar() {
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((v) => !v)}
-          className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--color-border-default)] text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-gold)] hover:text-[color:var(--color-gold)] sm:hidden"
+          className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--color-border-default)] text-[color:var(--color-text-muted)] transition-colors hover:border-[color:var(--color-bench)] hover:text-[color:var(--color-bench)] sm:hidden"
         >
           {mobileOpen ? <X size={16} /> : <Menu size={16} />}
         </button>
@@ -101,8 +103,8 @@ export function Navbar() {
               className={cn(
                 'block py-2 font-mono text-sm uppercase tracking-widest transition-colors',
                 isActive(pathname, l.href)
-                  ? 'text-[color:var(--color-gold)]'
-                  : 'text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-gold)]',
+                  ? 'text-[color:var(--color-bench)]'
+                  : 'text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-bench)]',
               )}
             >
               {l.label}
@@ -112,7 +114,7 @@ export function Navbar() {
             href="https://github.com/OneNomad-LLC/bench"
             target="_blank"
             rel="noopener noreferrer"
-            className="block py-2 font-mono text-sm uppercase tracking-widest text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-gold)]"
+            className="block py-2 font-mono text-sm uppercase tracking-widest text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-bench)]"
           >
             GitHub
           </a>

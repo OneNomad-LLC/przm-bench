@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!receipt) return { title: 'Receipt not found' }
 
   return {
-    title: `${receipt.adapter.name} v${receipt.adapter.version} — ${receipt.fixture.id} | Bench`,
+    title: `${receipt.adapter.name} v${receipt.adapter.version} — ${receipt.fixture.id} | przm`,
     description: `Signed benchmark receipt: ${receipt.adapter.name} v${receipt.adapter.version} on ${receipt.fixture.id}. R@10: ${(receipt.scores.recall_at_10 * 100).toFixed(1)}%, NDCG@10: ${(receipt.scores.ndcg_at_10 * 100).toFixed(1)}%, p50: ${Math.round(receipt.scores.latency_p50_ms)}ms. Run ${fmtDate(receipt.ranAt)}.`,
   }
 }
