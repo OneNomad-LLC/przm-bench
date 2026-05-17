@@ -21,19 +21,29 @@
  *   node --import tsx scripts/run-convergence-bench.ts
  */
 
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { dirname } from 'node:path'
+import { execSync } from 'node:child_process'
+import { randomUUID, createHash } from 'node:crypto'
 import { BaselineAnthropicAdapter } from '../src/adapters/multiagent/baseline-anthropic.js'
 import { AzureOpenAIBaselineAdapter } from '../src/adapters/multiagent/azure-openai-baseline.js'
 import { AutoGenAdapter } from '../src/adapters/multiagent/autogen.js'
-import { loadAllConvergenceScenarios } from '../src/fixtures-convergence.js'
+import {
+  loadAllConvergenceScenarios,
+  hashScenario,
+} from '../src/fixtures-convergence.js'
 import { scoreScenario, aggregateConvergenceScores } from '../src/scoring/convergence.js'
+import { signConvergenceReceipt } from '../src/receipt/sign-convergence.js'
 import type {
+  ConvergenceScenario,
+  ConvergenceScores,
+  DebateTranscript,
   MultiAgentAdapter,
   PerScenarioConvergenceResult,
-  ConvergenceScores,
+  PerScenarioReceiptEntry,
+  ConvergenceReceipt,
 } from '../src/types-convergence.js'
 
 const N_AGENTS = 3
@@ -45,18 +55,22 @@ const REPO_ROOT = join(HERE, '..')
 interface AdapterRun {
   adapterName: string
   llmModel: string
+  adapterVersion: string
   scores: ConvergenceScores
   perScenario: PerScenarioConvergenceResult[]
+  /** Full transcripts kept in-memory for receipt generation. */
+  transcriptsByScenarioId: Record<string, DebateTranscript>
   errors: Array<{ scenarioId: string; message: string }>
   durationMs: number
 }
 
 async function runAdapter(
   adapter: MultiAgentAdapter,
-  scenarios: Awaited<ReturnType<typeof loadAllConvergenceScenarios>>,
+  scenarios: ConvergenceScenario[],
 ): Promise<AdapterRun> {
   const t0 = Date.now()
   const perScenario: PerScenarioConvergenceResult[] = []
+  const transcriptsByScenarioId: Record<string, DebateTranscript> = {}
   const errors: Array<{ scenarioId: string; message: string }> = []
   for (const s of scenarios) {
     process.stdout.write(`    ${s.id.padEnd(30)} `)
@@ -67,6 +81,7 @@ async function runAdapter(
       })
       const result = scoreScenario(s, transcript)
       perScenario.push(result)
+      transcriptsByScenarioId[s.id] = transcript
       process.stdout.write(
         `consensus=${result.finalConsensus ?? 'TIE'}  ${result.correct ? 'CORRECT' : 'WRONG'}\n`,
       )
@@ -86,10 +101,98 @@ async function runAdapter(
   return {
     adapterName: adapter.name,
     llmModel: adapter.llmModel,
+    adapterVersion: adapter.version,
     scores,
     perScenario,
+    transcriptsByScenarioId,
     errors,
     durationMs: Date.now() - t0,
+  }
+}
+
+const BENCH_VERSION = '0.1.0-preview'
+
+function fixtureSetSha(scenarios: ConvergenceScenario[]): string {
+  const ids = [...scenarios].sort((a, b) => a.id.localeCompare(b.id))
+  const concat = ids.map((s) => `${s.id}:${hashScenario(s)}`).join(',')
+  return createHash('sha256').update(concat, 'utf8').digest('hex')
+}
+
+function buildPerScenarioEntries(
+  scenarios: ConvergenceScenario[],
+  perScenario: PerScenarioConvergenceResult[],
+  transcripts: Record<string, DebateTranscript>,
+): PerScenarioReceiptEntry[] {
+  const scenarioById = new Map(scenarios.map((s) => [s.id, s]))
+  return perScenario.map((r) => {
+    const scenario = scenarioById.get(r.scenarioId)
+    const transcript = transcripts[r.scenarioId]
+    if (!scenario || !transcript) {
+      throw new Error(
+        `cannot build receipt entry for ${r.scenarioId}: missing scenario or transcript`,
+      )
+    }
+    return {
+      scenarioId: r.scenarioId,
+      scenarioSha256: hashScenario(scenario),
+      finalConsensus: r.finalConsensus,
+      correct: r.correct,
+      collapsed: r.collapsed,
+      sycophancyOccurred: r.sycophancyOccurred,
+      positionFlipsByAgent: r.positionFlipsByAgent,
+      totalOutputTokens: r.totalOutputTokens,
+      transcript,
+    }
+  })
+}
+
+function getGitMeta(): { commit: string; dirty: boolean } {
+  try {
+    const commit = execSync('git rev-parse HEAD', {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+    }).trim()
+    const status = execSync('git status --porcelain', {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+    })
+    return { commit, dirty: status.length > 0 }
+  } catch {
+    return { commit: '0000000', dirty: true }
+  }
+}
+
+function buildReceiptForRun(
+  run: AdapterRun,
+  scenarios: ConvergenceScenario[],
+  ranAt: string,
+): Omit<ConvergenceReceipt, 'signature'> {
+  return {
+    receiptId: randomUUID(),
+    benchmark: 'convergence-v0.1-preview',
+    benchVersion: BENCH_VERSION,
+    ranAt,
+    adapter: {
+      name: run.adapterName,
+      version: run.adapterVersion,
+      llmModel: run.llmModel,
+    },
+    configuration: { nAgents: N_AGENTS, nRounds: N_ROUNDS },
+    fixtureSet: {
+      n: scenarios.length,
+      setSha256: fixtureSetSha(scenarios),
+    },
+    environment: {
+      node: process.version,
+      platform: `${process.platform}-${process.arch}`,
+      git: getGitMeta(),
+    },
+    scores: run.scores,
+    perScenario: buildPerScenarioEntries(
+      scenarios,
+      run.perScenario,
+      run.transcriptsByScenarioId,
+    ),
   }
 }
 
@@ -220,15 +323,15 @@ async function main() {
 
   printResults(runs)
 
-  // Write raw results to disk so we can replay / sign later
-  const outDir = join(REPO_ROOT, 'results', 'preview')
-  mkdirSync(outDir, { recursive: true })
-  const outFile = join(
-    outDir,
+  // Write raw preview to results/preview/ (gitignored, includes transcripts)
+  const previewDir = join(REPO_ROOT, 'results', 'preview')
+  mkdirSync(previewDir, { recursive: true })
+  const previewFile = join(
+    previewDir,
     `convergence-${startedAt.toISOString().replace(/[:.]/g, '-')}.json`,
   )
   writeFileSync(
-    outFile,
+    previewFile,
     JSON.stringify(
       {
         benchmark: 'convergence-v0.1-preview',
@@ -241,7 +344,50 @@ async function main() {
       2,
     ),
   )
-  console.log(`\nResults written to: ${outFile}`)
+  console.log(`\nPreview written to: ${previewFile}`)
+
+  // ── Sign + publish per-adapter receipts ────────────────────────
+  const privateKey = process.env['CONVERGENCE_SIGNING_PRIVATE_KEY']
+  if (!privateKey) {
+    console.log(
+      '\nSkipping signed-receipt publication: CONVERGENCE_SIGNING_PRIVATE_KEY not set.',
+    )
+    return
+  }
+
+  const publishDir = join(REPO_ROOT, 'results', 'published', 'convergence')
+  mkdirSync(publishDir, { recursive: true })
+  const ranAt = startedAt.toISOString()
+  const publishedPaths: string[] = []
+
+  for (const run of runs) {
+    if (run.perScenario.length === 0) {
+      console.log(`  skip ${run.adapterName}/${run.llmModel}: 0 scenarios scored`)
+      continue
+    }
+    try {
+      const unsigned = buildReceiptForRun(run, scenarios, ranAt)
+      const signed = signConvergenceReceipt(unsigned, privateKey)
+      const slug = `${run.adapterName}_${run.llmModel}`.replace(/[^a-z0-9_-]/gi, '-')
+      const dest = join(publishDir, `${ranAt.replace(/[:.]/g, '-')}_${slug}_${signed.receiptId}.json`)
+      writeFileSync(dest, JSON.stringify(signed, null, 2))
+      publishedPaths.push(dest)
+    } catch (e) {
+      console.error(`  failed to sign ${run.adapterName}/${run.llmModel}:`, (e as Error).message)
+    }
+  }
+  if (publishedPaths.length > 0) {
+    console.log(`\nSigned ${publishedPaths.length} receipt(s):`)
+    for (const p of publishedPaths) console.log(`  ${p}`)
+  }
+
+  // Sanity: re-canonicalize and verify each signed receipt before exit
+  for (const p of publishedPaths) {
+    const r = JSON.parse(readFileSync(p, 'utf-8'))
+    if (!r.signature?.value || !r.signature?.publicKeyFingerprint) {
+      console.error(`receipt ${p} missing signature fields`)
+    }
+  }
 }
 
 main().catch((e) => {

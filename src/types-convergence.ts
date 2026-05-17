@@ -164,3 +164,68 @@ export const CONVERGENCE_SCORES_KEYS = [
   'tokens_per_correct_answer',
   'position_flips_per_agent_per_round',
 ] as const
+
+// ── Signed receipt schema (the published artifact) ─────────────────
+
+export const ConvergenceScoresSchema = z.object({
+  correct_final_answer_rate: z.number().min(0).max(1),
+  collapse_rate: z.number().min(0).max(1),
+  sycophancy_ratio: z.number().min(0).max(1),
+  tokens_per_correct_answer: z.number().nonnegative(),
+  position_flips_per_agent_per_round: z.number().nonnegative(),
+})
+
+export const PerScenarioReceiptEntrySchema = z.object({
+  scenarioId: z.string(),
+  scenarioSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  finalConsensus: z.string().nullable(),
+  correct: z.boolean(),
+  collapsed: z.boolean(),
+  sycophancyOccurred: z.boolean().nullable(),
+  positionFlipsByAgent: z.array(z.number().int().nonnegative()),
+  totalOutputTokens: z.number().int().nonnegative(),
+  /** Full debate transcript — kept for adversarial verification. */
+  transcript: DebateTranscriptSchema,
+})
+
+export const ConvergenceReceiptSchema = z.object({
+  receiptId: z.string().uuid(),
+  benchmark: z.literal('convergence-v0.1-preview'),
+  benchVersion: z.string(),
+  ranAt: z.string().datetime(),
+  adapter: z.object({
+    name: z.string(),
+    version: z.string(),
+    llmModel: z.string(),
+  }),
+  configuration: z.object({
+    nAgents: z.number().int().positive(),
+    nRounds: z.number().int().positive(),
+  }),
+  fixtureSet: z.object({
+    /** Number of scenarios in the run. */
+    n: z.number().int().positive(),
+    /** SHA-256 of the canonicalized list of scenario SHA-256s (id-sorted). */
+    setSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  }),
+  environment: z.object({
+    node: z.string(),
+    platform: z.string(),
+    git: z.object({
+      commit: z.string().regex(/^[a-f0-9]{7,40}$/),
+      dirty: z.boolean(),
+    }),
+  }),
+  scores: ConvergenceScoresSchema,
+  perScenario: z.array(PerScenarioReceiptEntrySchema),
+  /** Present only on signed receipts. */
+  signature: z
+    .object({
+      algorithm: z.literal('Ed25519'),
+      publicKeyFingerprint: z.string(),
+      value: z.string(), // base64url
+    })
+    .optional(),
+})
+export type ConvergenceReceipt = z.infer<typeof ConvergenceReceiptSchema>
+export type PerScenarioReceiptEntry = z.infer<typeof PerScenarioReceiptEntrySchema>
