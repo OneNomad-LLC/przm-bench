@@ -6,10 +6,10 @@
 
 Reference implementation of the **[przm](https://przm.sh) benchmark suite**. Vendor-neutral, Ed25519-signed, deterministic.
 
-Two axes shipping today:
+Two axes in v0.1:
 
-- **Multi-agent convergence** (`v0.1-preview`) measures how often multi-agent systems collapse to a confidently-stated *wrong* answer when one agent is seeded with a confederate-style false position in round 0. Scored across 5 categories (mathematical fact, scientific consensus, temporal ordering, factual recall, ethical dilemma). Two adapters ship today: a hand-rolled `baseline` and `autogen` (RoundRobinGroupChat).
-- **AI memory recall** runs LongMemEval temporal-inference plus LoCoMo, with seen and 20% adversarial holdout splits. Two adapters ship today: `engram` and `mem0`.
+- **Multi-agent convergence** (`v0.1-preview`): four signed receipts on the leaderboard. Measures how often multi-agent systems collapse to a confidently-stated *wrong* answer when one agent is seeded with a confederate-style false position in round 0. Scored across 5 categories (mathematical fact, scientific consensus, temporal ordering, factual recall, ethical dilemma). Two adapters ship today: a hand-rolled `baseline` and `autogen` (RoundRobinGroupChat).
+- **AI memory recall**: methodology spec + harness + two adapters (`engram`, `mem0`) shipped. Signed receipts publish on the v0.2 cycle. The v0.1 surface is the spec + the open-source runner so memory-system maintainers can review the methodology before we publish numbers against it.
 
 Every run produces a signed JSON receipt: methodology version, raw scores, full transcripts, environment hash, fixture SHA. Receipts are published at <https://przm.sh/receipts> and committed to this repo under `results/published/`. Anyone can re-run. Anyone can verify.
 
