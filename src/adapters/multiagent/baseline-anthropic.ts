@@ -164,7 +164,7 @@ export class BaselineAnthropicAdapter implements MultiAgentAdapter {
       sameRoundPrior,
     )
 
-    const response = await this.client.messages.create({
+    const response = await this.callWithRetry({
       model: this.llmModel,
       max_tokens: this.maxTokens,
       temperature: 0,
@@ -275,6 +275,43 @@ export class BaselineAnthropicAdapter implements MultiAgentAdapter {
 
   async reset(): Promise<void> {
     // Stateless — nothing to clear.
+  }
+
+  /**
+   * Anthropic API call with retry-on-429 (rate limit) and 5xx (server error).
+   * Exponential backoff with header-aware sleep when retry-after is supplied.
+   * The full convergence run can hit tier-1 input-tokens-per-minute limits
+   * on Haiku when two adapters with the same model run back to back; this
+   * keeps the bench moving without manual restart.
+   */
+  private async callWithRetry(
+    params: Anthropic.MessageCreateParamsNonStreaming,
+    maxAttempts = 6,
+  ): Promise<Anthropic.Message> {
+    let lastErr: unknown
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        return await this.client.messages.create(params)
+      } catch (err) {
+        lastErr = err
+        const status = (err as { status?: number })?.status
+        const isRetriable = status === 429 || (status !== undefined && status >= 500)
+        if (!isRetriable || attempt === maxAttempts - 1) throw err
+        // Honor `retry-after` if present; else exponential backoff with jitter.
+        const headers = (err as { headers?: Record<string, string> })?.headers
+        const retryAfterSec = headers?.['retry-after']
+          ? Number.parseInt(headers['retry-after'], 10)
+          : undefined
+        const baseMs =
+          retryAfterSec && Number.isFinite(retryAfterSec)
+            ? retryAfterSec * 1000
+            : 2_000 * Math.pow(2, attempt)
+        const jitterMs = Math.random() * 500
+        const waitMs = Math.min(baseMs + jitterMs, 60_000)
+        await new Promise((resolve) => setTimeout(resolve, waitMs))
+      }
+    }
+    throw lastErr
   }
 }
 
