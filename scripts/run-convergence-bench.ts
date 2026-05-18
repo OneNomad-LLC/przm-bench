@@ -379,18 +379,23 @@ async function main() {
     }
   }
 
-  // AutoGen with Anthropic Claude Haiku 4.5 — second data point for the
-  // "orchestration matters independently of model" thesis. If this run
-  // also shows a low collapse rate (vs the 96.7% haiku baseline produced),
-  // we have a generalizable finding instead of a one-off result.
-  if (process.env['ANTHROPIC_API_KEY']) {
+  // AutoGen with Anthropic Claude Haiku 4.5 — deferred to v0.1.1.
+  // The AutoGen Python runner (autogen-runner/run_debate.py) doesn't
+  // wrap the Anthropic client with retry-on-429 the way the
+  // TypeScript baseline-anthropic adapter does. On tier-1 input-tokens-
+  // per-minute limits, the Python client hangs inside the LLM call
+  // until our 600s subprocess timeout fires, which produces a receipt
+  // dominated by timeout-error rows rather than real scores.
+  // Re-enable once the Python runner has a proper retry-with-backoff
+  // around the AnthropicChatCompletionClient call.
+  if (false && process.env['ANTHROPIC_API_KEY']) {
     adapters.push(
       new AutoGenAdapter({
         llmModel: 'claude-haiku-4-5',
         provider: {
           provider: 'anthropic',
           config: {
-            apiKey: process.env['ANTHROPIC_API_KEY'],
+            apiKey: process.env['ANTHROPIC_API_KEY']!,
             model: 'claude-haiku-4-5',
           },
         },
