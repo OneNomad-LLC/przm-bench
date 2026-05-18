@@ -30,6 +30,7 @@ import { randomUUID, createHash } from 'node:crypto'
 import { BaselineAnthropicAdapter } from '../src/adapters/multiagent/baseline-anthropic.js'
 import { AzureOpenAIBaselineAdapter } from '../src/adapters/multiagent/azure-openai-baseline.js'
 import { AutoGenAdapter } from '../src/adapters/multiagent/autogen.js'
+import { CrewAIAdapter } from '../src/adapters/multiagent/crewai.js'
 import {
   loadAllConvergenceScenarios,
   hashScenario,
@@ -330,6 +331,26 @@ async function main() {
         },
       }),
     )
+    // CrewAI sequential-process orchestration — v0.2 work in progress.
+    // Smoke-tested working end-to-end (see crewai-runner/README.md), but
+    // a litellm/Azure interop bug fails ~75% of multi-task scenarios
+    // ("argument of type 'NoneType' is not iterable" after 3 retries).
+    // Enable explicitly with ENABLE_CREWAI=true once that's resolved.
+    if (process.env['ENABLE_CREWAI'] === 'true') {
+      adapters.push(
+        new CrewAIAdapter({
+          llmModel: 'gpt-4o-mini',
+          provider: {
+            provider: 'openai-azure',
+            config: {
+              endpoint: process.env['AZURE_OPENAI_ENDPOINT'],
+              apiKey: process.env['AZURE_OPENAI_API_KEY'],
+              deploymentName: 'gpt-4o-mini',
+            },
+          },
+        }),
+      )
+    }
   }
 
   if (adapters.length === 0) {
@@ -337,8 +358,24 @@ async function main() {
     process.exit(1)
   }
 
+  // Optional filter: ADAPTER_FILTER=crewai runs only adapters whose
+  // .name contains the substring. Useful for incremental re-runs after
+  // adding a new adapter (avoids re-burning tokens on the existing
+  // signed receipts).
+  const filter = process.env['ADAPTER_FILTER']?.toLowerCase()
+  const filteredAdapters = filter
+    ? adapters.filter((a) => a.name.toLowerCase().includes(filter))
+    : adapters
+  if (filter && filteredAdapters.length === 0) {
+    console.error(`ADAPTER_FILTER=${filter} matched no adapters. Available: ${adapters.map((a) => a.name).join(', ')}`)
+    process.exit(1)
+  }
+  if (filter) {
+    console.log(`Filter active: running ${filteredAdapters.length} of ${adapters.length} adapters matching "${filter}"`)
+  }
+
   const runs: AdapterRun[] = []
-  for (const adapter of adapters) {
+  for (const adapter of filteredAdapters) {
     console.log(`\n── ${adapter.name} (${adapter.llmModel}) ────────────────────────`)
     runs.push(await runAdapter(adapter, scenarios))
   }
