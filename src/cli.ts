@@ -17,7 +17,7 @@
 
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { execSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import type { Adapter } from './types.js'
@@ -132,9 +132,11 @@ async function resolveAdapter(name: string): Promise<Adapter> {
   // src/adapters/<name>.ts must export a default that is an Adapter
   // instance, or a named export `adapter` of the same shape.
   const adapterPath = join(HERE, 'adapters', name + '.js')
+  // Windows ESM loader rejects raw drive-letter paths; convert to file:// URL.
+  const adapterUrl = pathToFileURL(adapterPath).href
   let mod: Record<string, unknown>
   try {
-    mod = (await import(adapterPath)) as Record<string, unknown>
+    mod = (await import(adapterUrl)) as Record<string, unknown>
   } catch (err) {
     throw new Error(
       `Could not load adapter "${name}" from ${adapterPath}.\n` +
@@ -143,11 +145,37 @@ async function resolveAdapter(name: string): Promise<Adapter> {
     )
   }
 
-  // Support default export or named `adapter` export.
-  const candidate = mod['default'] ?? mod['adapter']
-  if (!candidate || typeof (candidate as Adapter).ingest !== 'function') {
+  // Adapters can export a default instance, a named `adapter` instance,
+  // or a class named `*Adapter` (in which case we instantiate it with
+  // no args — adapter constructors are expected to accept defaults).
+  let candidate: unknown = mod['default'] ?? mod['adapter']
+  if (
+    !candidate ||
+    typeof candidate !== 'object' ||
+    typeof (candidate as { ingest?: unknown }).ingest !== 'function'
+  ) {
+    for (const [key, val] of Object.entries(mod)) {
+      if (typeof val === 'function' && /Adapter$/.test(key)) {
+        try {
+          const Ctor = val as new () => Adapter
+          const instance = new Ctor()
+          if (typeof instance.ingest === 'function') {
+            candidate = instance
+            break
+          }
+        } catch {
+          // Constructor needs args; skip and try the next export.
+        }
+      }
+    }
+  }
+  if (
+    !candidate ||
+    typeof candidate !== 'object' ||
+    typeof (candidate as { ingest?: unknown }).ingest !== 'function'
+  ) {
     throw new Error(
-      `Adapter "${name}" does not export a valid Adapter (missing .ingest method).`,
+      `Adapter "${name}" does not export a valid Adapter (no instance and no zero-arg *Adapter class found).`,
     )
   }
   return candidate as Adapter

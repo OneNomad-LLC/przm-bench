@@ -19,3 +19,12 @@ benchmarks/data/
 **/locomo/
 results/preview/
 src/adapters/multiagent/autogen-runner/.venv/
+
+# Local bench logs
+logs-*.txt
+
+# Signing intermediate
+tmp/
+
+# pnpm not used (npm)
+pnpm-lock.yaml

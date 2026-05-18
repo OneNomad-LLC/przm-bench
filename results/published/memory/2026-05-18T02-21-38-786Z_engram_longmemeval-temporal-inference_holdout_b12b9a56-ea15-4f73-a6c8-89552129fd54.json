@@ -1,0 +1,523 @@
+{
+  "receiptId": "b12b9a56-ea15-4f73-a6c8-89552129fd54",
+  "benchVersion": "0.0.1",
+  "ranAt": "2026-05-18T06:21:38.786Z",
+  "adapter": {
+    "name": "engram",
+    "version": "2.4.0"
+  },
+  "fixture": {
+    "id": "longmemeval-temporal-inference-full-holdout",
+    "sha256": "484244e03d19c5090eb3d6995ed401884bdf31e0fe7cfbf8539217dc4b6c7660",
+    "n": 1307
+  },
+  "environment": {
+    "node": "v25.8.2",
+    "platform": "win32/x64",
+    "git": {
+      "commit": "ba1c06fe03953f4306c920a1a534370ce13b825b",
+      "dirty": true
+    }
+  },
+  "scores": {
+    "recall_at_5": 0.5185185185185185,
+    "recall_at_10": 0.7777777777777778,
+    "ndcg_at_10": 0.9131405564062846,
+    "latency_p50_ms": 1821,
+    "latency_p95_ms": 2221,
+    "ingest_throughput_items_per_sec": 4.036566910651965
+  },
+  "perQuery": [
+    {
+      "queryId": "gpt4_8e165409",
+      "retrieved": [
+        "gpt4_8e165409:answer_d97db962_2",
+        "gpt4_8e165409:answer_d97db962_2",
+        "gpt4_8e165409:answer_d97db962_2",
+        "gpt4_8e165409:answer_d97db962_2",
+        "gpt4_8e165409:answer_d97db962_2",
+        "gpt4_8e165409:answer_d97db962_2",
+        "gpt4_8e165409:answer_d97db962_2",
+        "gpt4_8e165409:answer_d97db962_2",
+        "gpt4_8e165409:answer_d97db962_2",
+        "gpt4_8e165409:answer_d97db962_2"
+      ],
+      "hit": true,
+      "rank": 1,
+      "latencyMs": 1690
+    },
+    {
+      "queryId": "2ebe6c92",
+      "retrieved": [
+        "2ebe6c92:54c5a89c_1",
+        "2ebe6c90:ee82ed2c_1",
+        "2ebe6c90:ee82ed2c_1",
+        "2ebe6c90:ee82ed2c_1",
+        "2ebe6c90:ee82ed2c_1",
+        "2ebe6c90:ee82ed2c_1",
+        "2ebe6c90:ee82ed2c_1",
+        "gpt4_a1b77f9c:daac1a76",
+        "gpt4_65aabe59:52fdad30_4",
+        "gpt4_65aabe59:52fdad30_4"
+      ],
+      "hit": false,
+      "rank": null,
+      "latencyMs": 1248
+    },
+    {
+      "queryId": "gpt4_68e94287",
+      "retrieved": [
+        "gpt4_68e94287:answer_9793daa3_1",
+        "gpt4_65aabe59:bdefa576_1",
+        "gpt4_65aabe59:bdefa576_1",
+        "gpt4_65aabe59:bdefa576_1",
+        "gpt4_65aabe59:bdefa576_1",
+        "gpt4_65aabe59:bdefa576_1",
+        "gpt4_d6585ce8:0e193841_9",
+        "gpt4_65aabe59:a3edf982_2",
+        "gpt4_68e94287:answer_9793daa3_2",
+        "gpt4_d6585ce8:0e193841_9"
+      ],
+      "hit": true,
+      "rank": 1,
+      "latencyMs": 1594
+    },
+    {
+      "queryId": "2c63a862",
+      "retrieved": [
+        "2c63a862:answer_d39b7977_2",
+        "2c63a862:answer_d39b7977_1",
+        "2c63a862:answer_d39b7977_1",
+        "2c63a862:answer_d39b7977_1",
+        "2c63a862:answer_d39b7977_1",
+        "2c63a862:ad175dc4_2",
+        "2c63a862:answer_d39b7977_1",
+        "2c63a862:answer_d39b7977_1",
+        "gpt4_85da3956:fcc7fe77_2",
+        "2c63a862:answer_d39b7977_1"
+      ],
+      "hit": true,
+      "rank": 1,
+      "latencyMs": 1681
+    },
+    {
+      "queryId": "993da5e2",
+      "retrieved": [
+        "a3045048:79f74d4e_1",
+        "a3045048:79f74d4e_1",
+        "a3045048:79f74d4e_1",
+        "a3045048:79f74d4e_1",
+        "a3045048:79f74d4e_1",
+        "993da5e2:answer_54f0d6f9_1",
+        "a3045048:79f74d4e_1",
+        "a3045048:79f74d4e_1",
+        "a3045048:79f74d4e_1",
+        "a3045048:79f74d4e_1"
+      ],
+      "hit": true,
+      "rank": 6,
+      "latencyMs": 1719
+    },
+    {
+      "queryId": "gpt4_2312f94c",
+      "retrieved": [
+        "gpt4_2312f94c:answer_5328c3c2_2",
+        "gpt4_2312f94c:answer_5328c3c2_2",
+        "gpt4_2312f94c:answer_5328c3c2_2",
+        "71017277:ccaf07c8_1",
+        "gpt4_2312f94c:answer_5328c3c2_1",
+        "71017277:ccaf07c8_1",
+        "gpt4_2312f94c:answer_5328c3c2_1",
+        "gpt4_f420262d:e1023f28",
+        "gpt4_85da3956:ultrachat_16868",
+        "gpt4_2312f94c:answer_5328c3c2_1"
+      ],
+      "hit": true,
+      "rank": 1,
+      "latencyMs": 1647
+    },
+    {
+      "queryId": "71017277",
+      "retrieved": [
+        "gpt4_e061b84g:ae15e8b6_1",
+        "9a707b82:fab41c07",
+        "9a707b82:ed5c4c33_1",
+        "gpt4_21adecb5:8f4eb210",
+        "gpt4_21adecb5:8f4eb210",
+        "gpt4_21adecb5:8f4eb210",
+        "gpt4_21adecb5:8f4eb210",
+        "gpt4_a1b77f9c:0dcfb511_4",
+        "gpt4_f420262d:ad361482_1",
+        "a3045048:1fb37225"
+      ],
+      "hit": false,
+      "rank": null,
+      "latencyMs": 1504
+    },
+    {
+      "queryId": "gpt4_af6db32f",
+      "retrieved": [
+        "gpt4_f420262d:1032cbcf_1",
+        "gpt4_f420262d:1032cbcf_1",
+        "gpt4_f420262d:1032cbcf_1",
+        "gpt4_f420262d:1032cbcf_1",
+        "gpt4_f420262d:1032cbcf_1",
+        "gpt4_f420262d:1032cbcf_1",
+        "gpt4_af6db32f:answer_184c8f56_1",
+        "gpt4_af6db32f:answer_184c8f56_1",
+        "gpt4_af6db32f:answer_184c8f56_1",
+        "gpt4_76048e76:a4d6c239_2"
+      ],
+      "hit": true,
+      "rank": 7,
+      "latencyMs": 1589
+    },
+    {
+      "queryId": "gpt4_76048e76",
+      "retrieved": [
+        "gpt4_2655b836:answer_4be1b6b4_1",
+        "gpt4_76048e76:answer_b535969f_2",
+        "gpt4_76048e76:answer_b535969f_1",
+        "gpt4_76048e76:answer_b535969f_2",
+        "gpt4_2312f94c:answer_5328c3c2_1",
+        "9a707b82:9b3a20c1",
+        "9a707b82:9b3a20c1",
+        "gpt4_f420262d:answer_d8a1af6c_2",
+        "71017277:85a1be56_2",
+        "71017277:85a1be56_2"
+      ],
+      "hit": true,
+      "rank": 2,
+      "latencyMs": 1846
+    },
+    {
+      "queryId": "gpt4_78cf46a3",
+      "retrieved": [
+        "gpt4_d6585ce8:e9c1ef4b_2",
+        "gpt4_e061b84g:c575291e_1",
+        "gpt4_e061b84g:c575291e_1",
+        "gpt4_e061b84g:c575291e_1",
+        "gpt4_78cf46a3:answer_5a78688d_2",
+        "gpt4_78cf46a3:answer_5a78688d_2",
+        "gpt4_78cf46a3:answer_5a78688d_2",
+        "gpt4_78cf46a3:answer_5a78688d_2",
+        "gpt4_d6585ce8:e9c1ef4b_2",
+        "gpt4_2655b836:sharegpt_KzDwaf1_237"
+      ],
+      "hit": true,
+      "rank": 5,
+      "latencyMs": 1809
+    },
+    {
+      "queryId": "gpt4_f420262d",
+      "retrieved": [
+        "gpt4_0b2f1d21:e58c5e0f",
+        "gpt4_68e94287:363f7d1a_2",
+        "gpt4_68e94287:363f7d1a_2",
+        "gpt4_68e94287:363f7d1a_2",
+        "2ebe6c90:sharegpt_WddI4by_0",
+        "gpt4_0a05b494:8c4995d0",
+        "993da5e2:172a32de",
+        "gpt4_0a05b494:8c4995d0",
+        "gpt4_0a05b494:8c4995d0",
+        "gpt4_f420262d:answer_d8a1af6c_2"
+      ],
+      "hit": true,
+      "rank": 10,
+      "latencyMs": 1806
+    },
+    {
+      "queryId": "gpt4_85da3956",
+      "retrieved": [
+        "gpt4_85da3956:answer_581ab834_1",
+        "gpt4_85da3956:answer_581ab834_1",
+        "gpt4_85da3956:answer_581ab834_1",
+        "gpt4_85da3956:answer_581ab834_1",
+        "gpt4_85da3956:answer_581ab834_1",
+        "gpt4_af6db32f:e0b8c937_1",
+        "gpt4_76048e76:ultrachat_289307",
+        "gpt4_e061b84g:ultrachat_391029",
+        "gpt4_e061b84g:ultrachat_391029",
+        "gpt4_76048e76:ultrachat_289307"
+      ],
+      "hit": true,
+      "rank": 1,
+      "latencyMs": 1894
+    },
+    {
+      "queryId": "a3045048",
+      "retrieved": [
+        "a3045048:answer_016f6bd4_1",
+        "993da5e2:7b1d1f43_1",
+        "a3045048:answer_016f6bd4_1",
+        "a3045048:answer_016f6bd4_1",
+        "gpt4_21adecb5:942a8c5e_1",
+        "2ebe6c92:842137f5_2",
+        "993da5e2:7b1d1f43_1",
+        "71017277:f8de4e92_4",
+        "cc6d1ec1:d0e901bd_3",
+        "gpt4_21adecb5:942a8c5e_1"
+      ],
+      "hit": true,
+      "rank": 1,
+      "latencyMs": 1812
+    },
+    {
+      "queryId": "9a707b82",
+      "retrieved": [
+        "gpt4_65aabe59:a3edf982_2",
+        "gpt4_85da3956:6c184bde_2",
+        "gpt4_85da3956:6c184bde_2",
+        "993da5e2:7b1d1f43_1",
+        "993da5e2:7b1d1f43_1",
+        "gpt4_0a05b494:sharegpt_eWQFoct_17",
+        "993da5e2:7b1d1f43_1",
+        "b9cfe692:2c7bff3a_1",
+        "993da5e2:7b1d1f43_1",
+        "gpt4_0a05b494:sharegpt_eWQFoct_17"
+      ],
+      "hit": false,
+      "rank": null,
+      "latencyMs": 1915
+    },
+    {
+      "queryId": "gpt4_0b2f1d21",
+      "retrieved": [
+        "gpt4_0b2f1d21:answer_c4e5d969_2",
+        "gpt4_0b2f1d21:answer_c4e5d969_2",
+        "gpt4_0b2f1d21:answer_c4e5d969_2",
+        "gpt4_0b2f1d21:answer_c4e5d969_2",
+        "gpt4_0b2f1d21:answer_c4e5d969_2",
+        "gpt4_0b2f1d21:answer_c4e5d969_2",
+        "gpt4_0b2f1d21:answer_c4e5d969_1",
+        "gpt4_af6db32f:8ccbe6e0",
+        "gpt4_0b2f1d21:answer_c4e5d969_1",
+        "2ebe6c90:453d354e_1"
+      ],
+      "hit": true,
+      "rank": 1,
+      "latencyMs": 1800
+    },
+    {
+      "queryId": "gpt4_21adecb5",
+      "retrieved": [
+        "9a707b82:e627b1aa_1",
+        "9a707b82:e627b1aa_1",
+        "gpt4_21adecb5:sharegpt_ipLglky_42",
+        "9a707b82:e627b1aa_1",
+        "2c63a862:af7bcb21",
+        "9a707b82:e627b1aa_1",
+        "2c63a862:af7bcb21",
+        "2c63a862:af7bcb21",
+        "2c63a862:af7bcb21",
+        "gpt4_68e94287:ultrachat_297774"
+      ],
+      "hit": false,
+      "rank": null,
+      "latencyMs": 1821
+    },
+    {
+      "queryId": "gpt4_65aabe59",
+      "retrieved": [
+        "a3045048:220eeaeb_1",
+        "gpt4_a1b77f9c:ultrachat_44226",
+        "gpt4_2655b836:4acdd888",
+        "a3045048:220eeaeb_1",
+        "gpt4_2655b836:4acdd888",
+        "gpt4_2655b836:4acdd888",
+        "a3045048:220eeaeb_1",
+        "gpt4_2655b836:4acdd888",
+        "gpt4_a1b77f9c:ultrachat_44226",
+        "gpt4_a1b77f9c:ultrachat_44226"
+      ],
+      "hit": false,
+      "rank": null,
+      "latencyMs": 1950
+    },
+    {
+      "queryId": "2ebe6c90",
+      "retrieved": [
+        "gpt4_2d58bcd6:answer_3e11e0ae_1",
+        "gpt4_2312f94c:f3745025_2",
+        "gpt4_21adecb5:19f2e2c5_2",
+        "b9cfe692:answer_5e3bb940_3",
+        "b9cfe692:answer_5e3bb940_2",
+        "gpt4_a1b77f9c:answer_e9ad5914_2",
+        "2ebe6c92:answer_c9d35c00_2",
+        "71017277:445e6a7a_1",
+        "2ebe6c90:answer_c9d35c00_2",
+        "gpt4_2312f94c:f3745025_2"
+      ],
+      "hit": true,
+      "rank": 9,
+      "latencyMs": 2048
+    },
+    {
+      "queryId": "b9cfe692",
+      "retrieved": [
+        "gpt4_2d58bcd6:answer_3e11e0ae_2",
+        "gpt4_68e94287:52c6d59a_2",
+        "b9cfe692:answer_5e3bb940_1",
+        "2ebe6c92:1ba79ea8_1",
+        "gpt4_2d58bcd6:answer_3e11e0ae_1",
+        "gpt4_2d58bcd6:answer_3e11e0ae_2",
+        "71017277:445e6a7a_1",
+        "b9cfe692:answer_5e3bb940_2",
+        "71017277:445e6a7a_1",
+        "gpt4_a1b77f9c:answer_e9ad5914_2"
+      ],
+      "hit": true,
+      "rank": 3,
+      "latencyMs": 2097
+    },
+    {
+      "queryId": "cc6d1ec1",
+      "retrieved": [
+        "gpt4_68e94287:afc64a5c_1",
+        "gpt4_68e94287:afc64a5c_1",
+        "gpt4_68e94287:afc64a5c_1",
+        "gpt4_68e94287:afc64a5c_1",
+        "gpt4_68e94287:afc64a5c_1",
+        "gpt4_68e94287:afc64a5c_1",
+        "gpt4_68e94287:afc64a5c_1",
+        "gpt4_68e94287:afc64a5c_1",
+        "cc6d1ec1:answer_be73098b_2",
+        "gpt4_68e94287:afc64a5c_1"
+      ],
+      "hit": true,
+      "rank": 9,
+      "latencyMs": 1602
+    },
+    {
+      "queryId": "gpt4_0a05b494",
+      "retrieved": [
+        "gpt4_0a05b494:answer_a68db5db_2",
+        "gpt4_0a05b494:answer_a68db5db_2",
+        "gpt4_0a05b494:answer_a68db5db_2",
+        "gpt4_0a05b494:answer_a68db5db_2",
+        "gpt4_0a05b494:answer_a68db5db_2",
+        "71017277:sharegpt_lDQ2X2W_0",
+        "gpt4_0a05b494:answer_a68db5db_2",
+        "gpt4_0a05b494:answer_a68db5db_2",
+        "gpt4_0a05b494:answer_a68db5db_2",
+        "gpt4_0a05b494:answer_a68db5db_2"
+      ],
+      "hit": true,
+      "rank": 1,
+      "latencyMs": 1838
+    },
+    {
+      "queryId": "gpt4_2d58bcd6",
+      "retrieved": [
+        "gpt4_2d58bcd6:answer_3e11e0ae_1",
+        "2ebe6c92:1ba79ea8_1",
+        "gpt4_a1b77f9c:answer_e9ad5914_5",
+        "gpt4_a1b77f9c:answer_e9ad5914_5",
+        "gpt4_2d58bcd6:answer_3e11e0ae_1",
+        "gpt4_2d58bcd6:answer_3e11e0ae_1",
+        "gpt4_a1b77f9c:answer_e9ad5914_5",
+        "gpt4_a1b77f9c:answer_e9ad5914_5",
+        "gpt4_68e94287:52c6d59a_2",
+        "gpt4_2d58bcd6:answer_3e11e0ae_1"
+      ],
+      "hit": true,
+      "rank": 1,
+      "latencyMs": 2001
+    },
+    {
+      "queryId": "gpt4_a1b77f9c",
+      "retrieved": [
+        "2ebe6c92:acbb04c7",
+        "gpt4_2d58bcd6:answer_3e11e0ae_1",
+        "2ebe6c92:acbb04c7",
+        "gpt4_2312f94c:f3745025_2",
+        "2ebe6c92:acbb04c7",
+        "gpt4_2312f94c:f3745025_2",
+        "gpt4_2d58bcd6:answer_3e11e0ae_2",
+        "2ebe6c92:acbb04c7",
+        "gpt4_af6db32f:932c7d0d_1",
+        "gpt4_a1b77f9c:answer_e9ad5914_3"
+      ],
+      "hit": true,
+      "rank": 10,
+      "latencyMs": 2279
+    },
+    {
+      "queryId": "gpt4_2655b836",
+      "retrieved": [
+        "gpt4_f420262d:f0c5ec49",
+        "gpt4_f420262d:f0c5ec49",
+        "gpt4_f420262d:f0c5ec49",
+        "gpt4_f420262d:f0c5ec49",
+        "gpt4_2655b836:answer_4be1b6b4_2",
+        "gpt4_21adecb5:2880eb6c_1",
+        "2ebe6c90:ee82ed2c_1",
+        "gpt4_2655b836:answer_4be1b6b4_3",
+        "a3045048:d12d5a98_1",
+        "gpt4_2655b836:answer_4be1b6b4_2"
+      ],
+      "hit": true,
+      "rank": 5,
+      "latencyMs": 1864
+    },
+    {
+      "queryId": "gpt4_5438fa52",
+      "retrieved": [
+        "71017277:451ecb23_3",
+        "gpt4_78cf46a3:ultrachat_260301",
+        "gpt4_78cf46a3:ultrachat_260301",
+        "gpt4_5438fa52:answer_b10f3828_2",
+        "gpt4_5438fa52:answer_b10f3828_2",
+        "gpt4_5438fa52:answer_b10f3828_2",
+        "gpt4_5438fa52:answer_b10f3828_2",
+        "gpt4_5438fa52:answer_b10f3828_2",
+        "gpt4_5438fa52:answer_b10f3828_2",
+        "gpt4_5438fa52:answer_b10f3828_2"
+      ],
+      "hit": true,
+      "rank": 4,
+      "latencyMs": 1958
+    },
+    {
+      "queryId": "gpt4_d6585ce8",
+      "retrieved": [
+        "gpt4_76048e76:33a39aa7_2",
+        "gpt4_76048e76:33a39aa7_2",
+        "gpt4_76048e76:33a39aa7_2",
+        "gpt4_76048e76:33a39aa7_2",
+        "gpt4_76048e76:33a39aa7_2",
+        "gpt4_d6585ce8:answer_f999b05b_3",
+        "gpt4_d6585ce8:answer_f999b05b_3",
+        "gpt4_d6585ce8:answer_f999b05b_3",
+        "gpt4_d6585ce8:answer_f999b05b_4",
+        "gpt4_d6585ce8:answer_f999b05b_2"
+      ],
+      "hit": true,
+      "rank": 6,
+      "latencyMs": 2221
+    },
+    {
+      "queryId": "gpt4_e061b84g",
+      "retrieved": [
+        "gpt4_2d58bcd6:e06c6d99_5",
+        "gpt4_85da3956:fcc7fe77_2",
+        "gpt4_78cf46a3:answer_5a78688d_2",
+        "gpt4_2312f94c:0b8a4a9d_2",
+        "993da5e2:4a2c2dd1_2",
+        "993da5e2:4a2c2dd1_2",
+        "993da5e2:4a2c2dd1_2",
+        "gpt4_0a05b494:answer_a68db5db_1",
+        "gpt4_2d58bcd6:answer_3e11e0ae_1",
+        "gpt4_65aabe59:52fdad30_4"
+      ],
+      "hit": false,
+      "rank": null,
+      "latencyMs": 2189
+    }
+  ],
+  "signature": {
+    "algorithm": "Ed25519",
+    "publicKeyFingerprint": "sha256:888b25bad971ccea5918bba9a54649b731e901ecf781aaf4d50a5712bdfbcba7",
+    "value": "xm7IytS1-stiWvvr49kCSHgYxTQnxJepm0h75CTT6lZC2rXUBI82E1COKvJrEDvZUjY97usdu_SU1r7rFgH0Bg"
+  }
+}
