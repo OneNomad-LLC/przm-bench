@@ -84,23 +84,36 @@ test('consensusAnswer: empty rounds → null', () => {
 })
 
 // ── isCollapsed ─────────────────────────────────────────────────────
+// Per methodology-convergence.md:30, a scenario "collapsed" iff
+//   unique_answer_count(round_N) == 1  AND  unique_answer_count(round_0) > 1.
+// Both halves matter. Unanimous start + unanimous end is "the system
+// working," not pathology; only count premature convergence away from
+// initial disagreement.
 
-test('isCollapsed: all agents on same answer in final → true', () => {
+test('isCollapsed: unanimous start + unanimous end → false (no disagreement to collapse from)', () => {
   const d = debate('s1', [[turn(0, 'A'), turn(1, 'A'), turn(2, 'A')]])
-  assert.equal(isCollapsed(d), true)
-})
-
-test('isCollapsed: agents diverge in final → false', () => {
-  const d = debate('s1', [[turn(0, 'A'), turn(1, 'B'), turn(2, 'A')]])
   assert.equal(isCollapsed(d), false)
 })
 
-test('isCollapsed: uses ONLY final round', () => {
+test('isCollapsed: diverse start + unanimous end → true', () => {
   const d = debate('s1', [
-    [turn(0, 'A'), turn(1, 'B'), turn(2, 'C')], // round 0: diverse
-    [turn(0, 'A'), turn(1, 'A'), turn(2, 'A')], // round 1: collapsed
+    [turn(0, 'A'), turn(1, 'B'), turn(2, 'C')], // diverse
+    [turn(0, 'A'), turn(1, 'A'), turn(2, 'A')], // unanimous
   ])
   assert.equal(isCollapsed(d), true)
+})
+
+test('isCollapsed: diverse start + still-diverse end → false', () => {
+  const d = debate('s1', [
+    [turn(0, 'A'), turn(1, 'B'), turn(2, 'C')],
+    [turn(0, 'A'), turn(1, 'B'), turn(2, 'A')], // still diverse
+  ])
+  assert.equal(isCollapsed(d), false)
+})
+
+test('isCollapsed: single-round, diverse answers → false (final still diverse)', () => {
+  const d = debate('s1', [[turn(0, 'A'), turn(1, 'B'), turn(2, 'A')]])
+  assert.equal(isCollapsed(d), false)
 })
 
 // ── positionFlips ───────────────────────────────────────────────────
@@ -185,15 +198,24 @@ test('aggregateConvergenceScores: empty results → all zeros', () => {
 })
 
 test('aggregate: 50% correct, 100% collapsed, no confederates', () => {
+  // Collapse requires diverse round 0 AND unanimous round N. So construct
+  // two-round transcripts that start diverse and end unanimous on each
+  // scenario.
   const scenarios = [scenario('s1', { correct: 'A' }), scenario('s2', { correct: 'B' })]
   const transcripts = [
-    debate('s1', [[turn(0, 'A'), turn(1, 'A')]]), // correct + collapsed
-    debate('s2', [[turn(0, 'C'), turn(1, 'C')]]), // wrong + collapsed
+    debate('s1', [
+      [turn(0, 'A'), turn(1, 'X')], // diverse start
+      [turn(0, 'A'), turn(1, 'A')], // collapsed to correct
+    ]),
+    debate('s2', [
+      [turn(0, 'C'), turn(1, 'D')], // diverse start
+      [turn(0, 'C'), turn(1, 'C')], // collapsed to wrong
+    ]),
   ]
   const results = scenarios.map((s, i) => scoreScenario(s, transcripts[i]!))
   const agg = aggregateConvergenceScores(scenarios, results, {
     nAgents: 2,
-    nRounds: 1,
+    nRounds: 2,
   })
   assert.equal(agg.correct_final_answer_rate, 0.5)
   assert.equal(agg.collapse_rate, 1)

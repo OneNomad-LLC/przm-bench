@@ -282,6 +282,18 @@ async function main() {
         model: 'claude-haiku-4-5',
       }),
     )
+    // Sequential reveal variant — isolates the reveal-protocol effect
+    // from the orchestration-framework effect. Same prompts, same
+    // scoring, same fixture. The only difference vs the line above is
+    // that agent N in a round sees what agents 0..N-1 just said in
+    // that same round (matches AutoGen's RoundRobinGroupChat reveal).
+    adapters.push(
+      new BaselineAnthropicAdapter({
+        apiKey: process.env['ANTHROPIC_API_KEY'],
+        model: 'claude-haiku-4-5',
+        revealProtocol: 'sequential',
+      }),
+    )
   } else {
     console.log('skip: BaselineAnthropicAdapter (ANTHROPIC_API_KEY not set)')
   }
@@ -306,6 +318,20 @@ async function main() {
         apiKey: process.env['AZURE_OPENAI_API_KEY'],
         deploymentName: 'gpt-4o-mini',
         llmModel: 'gpt-4o-mini',
+      }),
+    )
+    // Sequential reveal variant of gpt-4o-mini baseline. Lets us
+    // compare AutoGen (which is sequential by design) against a
+    // sequential baseline on the same model — that comparison
+    // isolates the orchestration-framework effect from the reveal-
+    // protocol effect.
+    adapters.push(
+      new AzureOpenAIBaselineAdapter({
+        endpoint: process.env['AZURE_OPENAI_ENDPOINT'],
+        apiKey: process.env['AZURE_OPENAI_API_KEY'],
+        deploymentName: 'gpt-4o-mini',
+        llmModel: 'gpt-4o-mini',
+        revealProtocol: 'sequential',
       }),
     )
   } else {
@@ -353,18 +379,40 @@ async function main() {
     }
   }
 
+  // AutoGen with Anthropic Claude Haiku 4.5 — second data point for the
+  // "orchestration matters independently of model" thesis. If this run
+  // also shows a low collapse rate (vs the 96.7% haiku baseline produced),
+  // we have a generalizable finding instead of a one-off result.
+  if (process.env['ANTHROPIC_API_KEY']) {
+    adapters.push(
+      new AutoGenAdapter({
+        llmModel: 'claude-haiku-4-5',
+        provider: {
+          provider: 'anthropic',
+          config: {
+            apiKey: process.env['ANTHROPIC_API_KEY'],
+            model: 'claude-haiku-4-5',
+          },
+        },
+      }),
+    )
+  }
+
   if (adapters.length === 0) {
     console.error('No adapters available — set at least one credential pair.')
     process.exit(1)
   }
 
   // Optional filter: ADAPTER_FILTER=crewai runs only adapters whose
-  // .name contains the substring. Useful for incremental re-runs after
-  // adding a new adapter (avoids re-burning tokens on the existing
-  // signed receipts).
+  // .name OR .llmModel contains the substring. Useful for incremental
+  // re-runs after adding a new adapter (avoids re-burning tokens on the
+  // existing signed receipts). Match is on `<name>/<llmModel>` so you
+  // can target e.g. "autogen/haiku" or "autogen/claude".
   const filter = process.env['ADAPTER_FILTER']?.toLowerCase()
   const filteredAdapters = filter
-    ? adapters.filter((a) => a.name.toLowerCase().includes(filter))
+    ? adapters.filter((a) =>
+        `${a.name}/${a.llmModel}`.toLowerCase().includes(filter),
+      )
     : adapters
   if (filter && filteredAdapters.length === 0) {
     console.error(`ADAPTER_FILTER=${filter} matched no adapters. Available: ${adapters.map((a) => a.name).join(', ')}`)

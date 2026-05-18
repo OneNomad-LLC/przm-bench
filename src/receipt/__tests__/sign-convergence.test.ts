@@ -6,7 +6,10 @@ import {
   verify as cryptoVerify,
 } from 'node:crypto'
 import { signConvergenceReceipt } from '../sign-convergence.js'
-import { canonicalizeToBytes, type JsonValue } from '../canonicalize.js'
+import {
+  canonicalizeReceiptForSigning,
+  type JsonValue,
+} from '../canonicalize.js'
 import { fingerprint } from '../keys.js'
 import type { ConvergenceReceipt } from '../../types-convergence.js'
 
@@ -78,12 +81,33 @@ test('signConvergenceReceipt: signature verifies against canonicalized payload',
   assert.ok(signed.signature?.value)
   assert.ok(signed.signature?.publicKeyFingerprint)
 
-  // Manually verify: rebuild the unsigned bytes, run cryptoVerify with pubkey
-  const { signature: _sig, ...unsigned } = signed
-  const payload = canonicalizeToBytes(unsigned as unknown as JsonValue)
+  // Manually verify: rebuild the exact bytes the signer used (signer
+  // strips signature + ranAt + receiptId before canonicalizing), then
+  // run cryptoVerify with the pubkey.
+  const payload = canonicalizeReceiptForSigning(signed as unknown as JsonValue)
   const sigBuf = Buffer.from(signed.signature!.value, 'base64url')
   const ok = cryptoVerify(null, payload, publicKey, sigBuf)
   assert.equal(ok, true)
+})
+
+test('signConvergenceReceipt: signature is stable across different ranAt / receiptId', () => {
+  const { privateKey } = generateKeyPairSync('ed25519')
+  const privPem = privateKey.export({ type: 'pkcs8', format: 'pem' }) as string
+
+  const a = sampleReceipt()
+  const b: Omit<ConvergenceReceipt, 'signature'> = {
+    ...sampleReceipt(),
+    ranAt: '2099-12-31T23:59:59.999Z',
+    receiptId: '00000000-0000-0000-0000-000000000000',
+  }
+
+  const signedA = signConvergenceReceipt(a, privPem)
+  const signedB = signConvergenceReceipt(b, privPem)
+
+  // Same scores + same fixture + same code → byte-identical signature
+  // even when ranAt and receiptId differ. This is the reproducibility
+  // guarantee that backs the "anyone can re-run and verify" pitch.
+  assert.equal(signedA.signature!.value, signedB.signature!.value)
 })
 
 test('signConvergenceReceipt: fingerprint matches the public key', () => {
@@ -105,8 +129,7 @@ test('signConvergenceReceipt: tampering the scores invalidates the signature', (
     ...signed,
     scores: { ...signed.scores, correct_final_answer_rate: 0.5 },
   }
-  const { signature: _sig, ...unsigned } = tampered
-  const payload = canonicalizeToBytes(unsigned as unknown as JsonValue)
+  const payload = canonicalizeReceiptForSigning(tampered as unknown as JsonValue)
   const sigBuf = Buffer.from(tampered.signature!.value, 'base64url')
   const ok = cryptoVerify(null, payload, publicKey, sigBuf)
   assert.equal(ok, false)
@@ -119,8 +142,7 @@ test('signConvergenceReceipt: tampering a transcript message invalidates the sig
 
   const tampered: ConvergenceReceipt = JSON.parse(JSON.stringify(signed))
   tampered.perScenario[0]!.transcript.rounds[0]!.perAgent[0]!.message = 'tampered'
-  const { signature: _sig, ...unsigned } = tampered
-  const payload = canonicalizeToBytes(unsigned as unknown as JsonValue)
+  const payload = canonicalizeReceiptForSigning(tampered as unknown as JsonValue)
   const sigBuf = Buffer.from(tampered.signature!.value, 'base64url')
   const ok = cryptoVerify(null, payload, publicKey, sigBuf)
   assert.equal(ok, false)

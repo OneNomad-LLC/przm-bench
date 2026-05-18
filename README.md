@@ -85,11 +85,14 @@ FIXTURE_SUBSET=holdout pnpm tsx scripts/run-convergence-bench.ts --adapter autog
 
 Receipts land in `results/`. Sign them in CI (the private key never sits on disk locally; see `scripts/gen-convergence-key.cjs` for keypair generation if you're standing up your own instance).
 
-### Memory (LongMemEval + LoCoMo)
+### Memory (LongMemEval temporal-inference subset)
 
 ```bash
-pnpm onenomad-bench run --adapter engram --fixture fixtures/longmemeval/temporal-inference.json
+pnpm przm-bench run --adapter engram --fixture fixtures/longmemeval-temporal-inference-v1.json
 ```
+
+LoCoMo and the other LongMemEval categories are v0.2 work. v0.1 ships
+only the temporal-inference subset.
 
 `onenomad-bench` is the CLI bin; outputs an unsigned receipt JSON. Signing happens in CI.
 

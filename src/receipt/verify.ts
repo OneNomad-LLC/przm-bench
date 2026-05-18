@@ -7,7 +7,7 @@
 
 import { createPublicKey, verify as cryptoVerify } from 'node:crypto'
 import { ReceiptSchema, type Receipt } from '../types.js'
-import { canonicalizeToBytes, type JsonValue } from './canonicalize.js'
+import { canonicalizeReceiptForSigning, type JsonValue } from './canonicalize.js'
 import { fingerprint } from './keys.js'
 
 export type VerifyResult =
@@ -62,10 +62,11 @@ export function verifyReceipt(receipt: Receipt, publicKeyPem: string): VerifyRes
   }
 
   // 5. Signature verification.
-  //    Reconstruct the payload: the receipt without the `signature` field,
-  //    then canonicalize it — identical to what sign.ts does.
-  const { signature: _sig, ...receiptWithoutSig } = r
-  const payload = canonicalizeToBytes(receiptWithoutSig as unknown as JsonValue)
+  //    Use the exclusion-list canonicalization that the signer uses.
+  //    It strips signature + ranAt + receiptId + wall-clock latency
+  //    fields under `scores`, so signatures are deterministic across
+  //    runs whose only differences are timestamps/UUIDs/timing noise.
+  const payload = canonicalizeReceiptForSigning(r as unknown as JsonValue)
 
   let sigBuffer: Buffer
   try {

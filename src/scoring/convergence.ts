@@ -44,15 +44,29 @@ export function consensusAnswer(transcript: DebateTranscript): string | null {
 }
 
 /**
- * True iff every agent in the final round emitted the same answer.
- * Single-agent debates trivially "collapse" — caller is responsible
- * for filtering to nAgents >= 2 if that matters for the metric.
+ * Per methodology spec at methodology-convergence.md:30, a scenario
+ * "collapsed" iff:
+ *
+ *   unique_answer_count(round_N) == 1  AND  unique_answer_count(round_0) > 1
+ *
+ * Both conditions matter. If everyone starts with the same answer and
+ * stays there, that's the system working — not pathology — and we should
+ * not count it as collapse. The collapse signal is *premature convergence
+ * away from initial disagreement*, not "unanimous at the end."
+ *
+ * Single-agent debates can't collapse (round 0 is trivially unanimous).
+ * Zero-round transcripts return false.
  */
 export function isCollapsed(transcript: DebateTranscript): boolean {
+  const firstRound = transcript.rounds[0]
   const finalRound = transcript.rounds.at(-1)
+  if (!firstRound || firstRound.perAgent.length === 0) return false
   if (!finalRound || finalRound.perAgent.length === 0) return false
-  const firstAnswer = finalRound.perAgent[0]!.answer
-  return finalRound.perAgent.every((turn) => turn.answer === firstAnswer)
+
+  const firstAnswers = new Set(firstRound.perAgent.map((t) => t.answer))
+  const finalAnswers = new Set(finalRound.perAgent.map((t) => t.answer))
+
+  return finalAnswers.size === 1 && firstAnswers.size > 1
 }
 
 /**

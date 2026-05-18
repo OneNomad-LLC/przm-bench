@@ -78,9 +78,23 @@ def build_model_client(provider: str, cfg: dict[str, Any]):
         )
     if provider == "anthropic":
         from autogen_ext.models.anthropic import AnthropicChatCompletionClient
+        from autogen_core.models import ModelFamily, ModelInfo
+        # AutoGen's built-in registry doesn't recognize newer Claude models
+        # (claude-haiku-4-5, claude-sonnet-4-5, claude-opus-4-7) so
+        # function_calling defaults to False and AssistantAgent refuses
+        # the model. All current Claude models support tool use natively;
+        # declare capabilities explicitly to bypass the registry check.
+        model_info: ModelInfo = {
+            "vision": True,
+            "function_calling": True,
+            "json_output": True,
+            "family": ModelFamily.CLAUDE_3_5_HAIKU,
+            "structured_output": True,
+        }
         return AnthropicChatCompletionClient(
             model=cfg["model"],
             api_key=cfg["apiKey"],
+            model_info=model_info,
         )
     raise ValueError(f"Unknown provider: {provider}")
 

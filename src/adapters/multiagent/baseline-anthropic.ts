@@ -51,6 +51,17 @@ interface BaselineAdapterOpts {
   maxTokens?: number
   /** Inject a pre-built client (testing). */
   client?: Anthropic
+  /**
+   * Within-round visibility protocol. Default `'synchronous'`: each
+   * agent in a round answers without seeing any other agent's
+   * same-round messages — only prior rounds are visible.
+   * `'sequential'`: agent N in a round sees what agents 0..N-1 just
+   * said this round, in addition to prior rounds. This matches
+   * AutoGen's RoundRobinGroupChat. Without this option, comparing
+   * the hand-rolled baseline to AutoGen conflates orchestration
+   * with reveal protocol; with it, we can isolate each effect.
+   */
+  revealProtocol?: 'synchronous' | 'sequential'
 }
 
 const SUBMIT_ANSWER_TOOL: Anthropic.Tool = {
@@ -76,16 +87,22 @@ const SUBMIT_ANSWER_TOOL: Anthropic.Tool = {
 }
 
 export class BaselineAnthropicAdapter implements MultiAgentAdapter {
-  readonly name = 'baseline-anthropic'
+  readonly name: 'baseline-anthropic' | 'baseline-anthropic-sequential'
   readonly version = '0.1.0'
   readonly llmModel: string
   private readonly client: Anthropic
   private readonly maxTokens: number
+  private readonly revealProtocol: 'synchronous' | 'sequential'
 
   constructor(opts: BaselineAdapterOpts = {}) {
     this.llmModel = opts.model ?? 'claude-haiku-4-5'
     this.maxTokens = opts.maxTokens ?? 1024
     this.client = opts.client ?? new Anthropic({ apiKey: opts.apiKey })
+    this.revealProtocol = opts.revealProtocol ?? 'synchronous'
+    this.name =
+      this.revealProtocol === 'sequential'
+        ? 'baseline-anthropic-sequential'
+        : 'baseline-anthropic'
   }
 
   async runDebate(
@@ -107,7 +124,19 @@ export class BaselineAnthropicAdapter implements MultiAgentAdapter {
     for (let r = 0; r < opts.nRounds; r++) {
       const perAgent: PerAgentRound[] = []
       for (let a = 0; a < opts.nAgents; a++) {
-        perAgent.push(await this.runOneAgentRound(scenario, a, r, rounds))
+        // Sequential reveal: agent A sees what 0..A-1 just said this round.
+        // Synchronous reveal: agent A sees only prior rounds.
+        const sameRoundPrior =
+          this.revealProtocol === 'sequential' ? perAgent.slice() : []
+        perAgent.push(
+          await this.runOneAgentRound(
+            scenario,
+            a,
+            r,
+            rounds,
+            sameRoundPrior,
+          ),
+        )
       }
       rounds.push({ roundNumber: r, perAgent })
     }
@@ -120,6 +149,7 @@ export class BaselineAnthropicAdapter implements MultiAgentAdapter {
     agentIndex: number,
     roundNumber: number,
     priorRounds: DebateRound[],
+    sameRoundPrior: PerAgentRound[] = [],
   ): Promise<PerAgentRound> {
     const systemPrompt = this.buildSystemPrompt(
       scenario,
@@ -131,6 +161,7 @@ export class BaselineAnthropicAdapter implements MultiAgentAdapter {
       agentIndex,
       roundNumber,
       priorRounds,
+      sameRoundPrior,
     )
 
     const response = await this.client.messages.create({
@@ -201,29 +232,42 @@ export class BaselineAnthropicAdapter implements MultiAgentAdapter {
     agentIndex: number,
     roundNumber: number,
     priorRounds: DebateRound[],
+    sameRoundPrior: PerAgentRound[] = [],
   ): string {
     const parts: string[] = []
     parts.push(`Question: ${scenario.question}`)
 
-    if (priorRounds.length === 0) {
+    if (priorRounds.length === 0 && sameRoundPrior.length === 0) {
       parts.push(
         `\nThis is round 0. No prior debate. Submit your initial answer.`,
       )
       return parts.join('\n')
     }
 
-    parts.push(`\nPrior rounds:`)
-    for (const round of priorRounds) {
-      parts.push(`\n── Round ${round.roundNumber} ──`)
-      for (const turn of round.perAgent) {
-        const tag = turn.agentIndex === agentIndex ? ` (you)` : ''
+    if (priorRounds.length > 0) {
+      parts.push(`\nPrior rounds:`)
+      for (const round of priorRounds) {
+        parts.push(`\n── Round ${round.roundNumber} ──`)
+        for (const turn of round.perAgent) {
+          const tag = turn.agentIndex === agentIndex ? ` (you)` : ''
+          parts.push(
+            `Agent ${turn.agentIndex}${tag} answered "${turn.answer}". Reasoning: ${turn.message}`,
+          )
+        }
+      }
+    }
+
+    if (sameRoundPrior.length > 0) {
+      parts.push(`\n── Round ${roundNumber} so far (other agents speaking before you) ──`)
+      for (const turn of sameRoundPrior) {
         parts.push(
-          `Agent ${turn.agentIndex}${tag} answered "${turn.answer}". Reasoning: ${turn.message}`,
+          `Agent ${turn.agentIndex} answered "${turn.answer}". Reasoning: ${turn.message}`,
         )
       }
     }
+
     parts.push(
-      `\nThis is round ${roundNumber}. Review the prior rounds and submit your current best answer. ` +
+      `\nThis is round ${roundNumber}. Review the prior context and submit your current best answer. ` +
         `If you've changed your mind, explain why in your reasoning. If you're holding your position, say so.`,
     )
     return parts.join('\n')

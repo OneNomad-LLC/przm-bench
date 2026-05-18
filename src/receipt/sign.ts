@@ -10,7 +10,7 @@
 
 import { createPrivateKey, createPublicKey, sign as cryptoSign } from 'node:crypto'
 import { type Receipt } from '../types.js'
-import { canonicalizeToBytes, type JsonValue } from './canonicalize.js'
+import { canonicalizeReceiptForSigning, type JsonValue } from './canonicalize.js'
 import { fingerprint } from './keys.js'
 
 /**
@@ -33,9 +33,13 @@ export function signReceipt(
   // requiring the caller to supply it separately.
   const pubKeyObj = createPublicKey(privKeyObj)
 
-  // Compute the canonicalized payload — the bytes actually signed.
-  // Cast is safe: Receipt fields are all JSON-serializable primitives/objects.
-  const payload = canonicalizeToBytes(receipt as unknown as JsonValue)
+  // Canonicalize WITHOUT non-deterministic fields. `ranAt`, `receiptId`,
+  // and the wall-clock latency/throughput fields under `scores` are
+  // stripped so two runs of the same code + same fixture + same adapter
+  // version produce byte-identical signed bytes (and therefore byte-
+  // identical signatures). Those stripped fields stay in the receipt
+  // JSON; they're just not covered by the signature.
+  const payload = canonicalizeReceiptForSigning(receipt as unknown as JsonValue)
 
   // Ed25519 sign — no digest algorithm argument; Ed25519 hashes internally.
   const sigBuffer = cryptoSign(null, payload, privKeyObj)

@@ -12,7 +12,7 @@ import {
   ConvergenceReceiptSchema,
   type ConvergenceReceipt,
 } from '../types-convergence.js'
-import { canonicalizeToBytes, type JsonValue } from './canonicalize.js'
+import { canonicalizeReceiptForSigning, type JsonValue } from './canonicalize.js'
 import { fingerprint } from './keys.js'
 import type { VerifyResult } from './verify.js'
 
@@ -58,8 +58,11 @@ export function verifyConvergenceReceipt(
     return { ok: false, reason: 'public key fingerprint mismatch' }
   }
 
-  const { signature: _sig, ...receiptWithoutSig } = r
-  const payload = canonicalizeToBytes(receiptWithoutSig as unknown as JsonValue)
+  // Use the same exclusion-list canonicalization that the signer uses.
+  // It internally strips signature + ranAt + receiptId so signatures
+  // are stable across runs whose only differences are timestamps and
+  // random UUIDs.
+  const payload = canonicalizeReceiptForSigning(r as unknown as JsonValue)
 
   let sigBuffer: Buffer
   try {

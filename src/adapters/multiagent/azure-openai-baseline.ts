@@ -50,6 +50,14 @@ interface AzureOpenAIBaselineAdapterOpts {
   /** Inject a pre-built client (testing). When supplied, endpoint/apiKey
    *  /apiVersion are ignored — the supplied client is used as-is. */
   client?: AzureOpenAI
+  /**
+   * Within-round visibility protocol. Default `'synchronous'`: agents
+   * answer blind in-round, only seeing prior rounds. `'sequential'`:
+   * agent N sees what agents 0..N-1 just said in the same round.
+   * Matches AutoGen's RoundRobinGroupChat reveal. Lets us isolate
+   * reveal-protocol effect from orchestration-framework effect.
+   */
+  revealProtocol?: 'synchronous' | 'sequential'
 }
 
 const SUBMIT_ANSWER_TOOL: ChatCompletionTool = {
@@ -78,12 +86,13 @@ const SUBMIT_ANSWER_TOOL: ChatCompletionTool = {
 }
 
 export class AzureOpenAIBaselineAdapter implements MultiAgentAdapter {
-  readonly name = 'baseline-azure-openai'
+  readonly name: 'baseline-azure-openai' | 'baseline-azure-openai-sequential'
   readonly version = '0.1.0'
   readonly llmModel: string
   private readonly client: AzureOpenAI
   private readonly deploymentName: string
   private readonly maxTokens: number
+  private readonly revealProtocol: 'synchronous' | 'sequential'
 
   constructor(opts: AzureOpenAIBaselineAdapterOpts) {
     this.llmModel = opts.llmModel
@@ -97,6 +106,11 @@ export class AzureOpenAIBaselineAdapter implements MultiAgentAdapter {
         apiVersion: opts.apiVersion ?? '2024-12-01-preview',
         deployment: opts.deploymentName,
       })
+    this.revealProtocol = opts.revealProtocol ?? 'synchronous'
+    this.name =
+      this.revealProtocol === 'sequential'
+        ? 'baseline-azure-openai-sequential'
+        : 'baseline-azure-openai'
   }
 
   async runDebate(
@@ -118,7 +132,19 @@ export class AzureOpenAIBaselineAdapter implements MultiAgentAdapter {
     for (let r = 0; r < opts.nRounds; r++) {
       const perAgent: PerAgentRound[] = []
       for (let a = 0; a < opts.nAgents; a++) {
-        perAgent.push(await this.runOneAgentRound(scenario, a, r, rounds))
+        // Sequential reveal: agent A sees what 0..A-1 just said this round.
+        // Synchronous reveal: agent A sees only prior rounds.
+        const sameRoundPrior =
+          this.revealProtocol === 'sequential' ? perAgent.slice() : []
+        perAgent.push(
+          await this.runOneAgentRound(
+            scenario,
+            a,
+            r,
+            rounds,
+            sameRoundPrior,
+          ),
+        )
       }
       rounds.push({ roundNumber: r, perAgent })
     }
@@ -131,6 +157,7 @@ export class AzureOpenAIBaselineAdapter implements MultiAgentAdapter {
     agentIndex: number,
     roundNumber: number,
     priorRounds: DebateRound[],
+    sameRoundPrior: PerAgentRound[] = [],
   ): Promise<PerAgentRound> {
     const systemPrompt = this.buildSystemPrompt(scenario, agentIndex, roundNumber)
     const userMessage = this.buildUserMessage(
@@ -138,6 +165,7 @@ export class AzureOpenAIBaselineAdapter implements MultiAgentAdapter {
       agentIndex,
       roundNumber,
       priorRounds,
+      sameRoundPrior,
     )
 
     const response = await this.client.chat.completions.create({
@@ -220,29 +248,42 @@ export class AzureOpenAIBaselineAdapter implements MultiAgentAdapter {
     agentIndex: number,
     roundNumber: number,
     priorRounds: DebateRound[],
+    sameRoundPrior: PerAgentRound[] = [],
   ): string {
     const parts: string[] = []
     parts.push(`Question: ${scenario.question}`)
 
-    if (priorRounds.length === 0) {
+    if (priorRounds.length === 0 && sameRoundPrior.length === 0) {
       parts.push(
         `\nThis is round 0. No prior debate. Submit your initial answer.`,
       )
       return parts.join('\n')
     }
 
-    parts.push(`\nPrior rounds:`)
-    for (const round of priorRounds) {
-      parts.push(`\n── Round ${round.roundNumber} ──`)
-      for (const turn of round.perAgent) {
-        const tag = turn.agentIndex === agentIndex ? ` (you)` : ''
+    if (priorRounds.length > 0) {
+      parts.push(`\nPrior rounds:`)
+      for (const round of priorRounds) {
+        parts.push(`\n── Round ${round.roundNumber} ──`)
+        for (const turn of round.perAgent) {
+          const tag = turn.agentIndex === agentIndex ? ` (you)` : ''
+          parts.push(
+            `Agent ${turn.agentIndex}${tag} answered "${turn.answer}". Reasoning: ${turn.message}`,
+          )
+        }
+      }
+    }
+
+    if (sameRoundPrior.length > 0) {
+      parts.push(`\n── Round ${roundNumber} so far (other agents speaking before you) ──`)
+      for (const turn of sameRoundPrior) {
         parts.push(
-          `Agent ${turn.agentIndex}${tag} answered "${turn.answer}". Reasoning: ${turn.message}`,
+          `Agent ${turn.agentIndex} answered "${turn.answer}". Reasoning: ${turn.message}`,
         )
       }
     }
+
     parts.push(
-      `\nThis is round ${roundNumber}. Review the prior rounds and submit your current best answer. ` +
+      `\nThis is round ${roundNumber}. Review the prior context and submit your current best answer. ` +
         `If you've changed your mind, explain why in your reasoning. If you're holding your position, say so.`,
     )
     return parts.join('\n')

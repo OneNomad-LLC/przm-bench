@@ -12,7 +12,7 @@
  */
 
 import { createPrivateKey, createPublicKey, sign as cryptoSign } from 'node:crypto'
-import { canonicalizeToBytes, type JsonValue } from './canonicalize.js'
+import { canonicalizeReceiptForSigning, type JsonValue } from './canonicalize.js'
 import { fingerprint } from './keys.js'
 import type { ConvergenceReceipt } from '../types-convergence.js'
 
@@ -23,10 +23,13 @@ export function signConvergenceReceipt(
   const privKeyObj = createPrivateKey(privateKeyPem)
   const pubKeyObj = createPublicKey(privKeyObj)
 
-  // The receipt is cast to JsonValue — all ConvergenceReceipt fields are
-  // primitives, arrays of primitives, or nested plain objects, so this
-  // is safe under JCS canonicalization.
-  const payload = canonicalizeToBytes(receipt as unknown as JsonValue)
+  // Canonicalize WITHOUT non-deterministic fields (ranAt, receiptId).
+  // Same code + same fixture + same adapter version + same model →
+  // same bytes here → same signature, even across different runs
+  // whose wall-clock timestamps and minted UUIDs differ. Those fields
+  // remain in the receipt JSON for consumers; they're just not COVERED
+  // by the signature.
+  const payload = canonicalizeReceiptForSigning(receipt as unknown as JsonValue)
   const sigBuffer = cryptoSign(null, payload, privKeyObj)
   const sigValue = sigBuffer.toString('base64url')
 
