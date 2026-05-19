@@ -29,3 +29,4 @@ tmp/
 # pnpm not used (npm)
 pnpm-lock.yaml
 bench-clean-rerun-*.log
+bench-rerun-*.log
