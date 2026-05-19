@@ -8,7 +8,7 @@ Reference implementation of the **[przm](https://przm.sh) benchmark suite**. Ven
 
 Two axes in v0.1:
 
-- **Multi-agent convergence** (`v0.1-preview`): four signed receipts on the leaderboard. Measures how often multi-agent systems collapse to a confidently-stated *wrong* answer when one agent is seeded with a confederate-style false position in round 0. Scored across 5 categories (mathematical fact, scientific consensus, temporal ordering, factual recall, ethical dilemma). Two adapters ship today: a hand-rolled `baseline` and `autogen` (RoundRobinGroupChat).
+- **Multi-agent convergence** (`v0.1-preview`): twelve signed receipts on the leaderboard (six adapter configurations × combined-30 + 6-fixture holdout). Measures how often multi-agent systems collapse to a confidently-stated *wrong* answer when one agent is seeded with a confederate-style false position in round 0. Scored across 5 categories (factual-math, code-correctness, factual-history, temporal-ordering, boolean-trap). Six adapter configurations ship today: hand-rolled `baseline` (sync + sequential variants on Claude Haiku 4.5, sync + sequential on gpt-4o-mini, sync on gpt-5-mini) plus `autogen` (RoundRobinGroupChat on gpt-4o-mini).
 - **AI memory recall**: methodology spec + harness + two adapters (`engram`, `mem0`) shipped. Signed receipts publish on the v0.2 cycle. The v0.1 surface is the spec + the open-source runner so memory-system maintainers can review the methodology before we publish numbers against it.
 
 Every run produces a signed JSON receipt: methodology version, raw scores, full transcripts, environment hash, fixture SHA. Receipts are published at <https://przm.sh/receipts> and committed to this repo under `results/published/`. Anyone can re-run. Anyone can verify.
@@ -19,15 +19,29 @@ Every run produces a signed JSON receipt: methodology version, raw scores, full 
 
 ## What's on the leaderboard right now
 
-| Axis        | Adapter            | Model            | Subset    | Headline number                |
-|-------------|--------------------|------------------|-----------|--------------------------------|
-| convergence | `baseline`         | claude-haiku-4-5 | combined  | 93.3% correct, 96.7% collapse  |
-| convergence | `baseline`         | gpt-5-mini       | combined  | 96.7% correct, 96.7% collapse  |
-| convergence | `baseline`         | gpt-4o-mini      | combined  | 83.3% correct, 96.7% collapse  |
-| convergence | `autogen`          | gpt-4o-mini      | combined  | 83.3% correct, **13.3% collapse** |
-| convergence | `autogen`          | gpt-4o-mini      | holdout   | 66.7% correct, 0.0% collapse   |
+Combined 30-fixture run:
 
-**Notable finding**: holding gpt-4o-mini constant, AutoGen's RoundRobinGroupChat orchestration produces a **7.3× lower collapse rate** than the hand-rolled synchronous-round baseline on the same 30 scenarios. The framework choice is a load-bearing reliability variable, independent of model.
+| Axis        | Adapter                       | Model            | correct | collapse |
+|-------------|-------------------------------|------------------|---------|----------|
+| convergence | `baseline` (sync)             | claude-haiku-4-5 | 96.7%   | 56.7%    |
+| convergence | `baseline` (sequential)       | claude-haiku-4-5 | 93.3%   | 53.3%    |
+| convergence | `baseline` (sync)             | gpt-5-mini       | 96.7%   | 100.0%   |
+| convergence | `baseline` (sync)             | gpt-4o-mini      | 90.0%   | 90.0%    |
+| convergence | `baseline` (sequential)       | gpt-4o-mini      | 83.3%   | 83.3%    |
+| convergence | `autogen` RoundRobinGroupChat | gpt-4o-mini      | 83.3%   | **20.0%**|
+
+Sealed 6-fixture holdout:
+
+| Axis        | Adapter                       | Model            | correct | collapse |
+|-------------|-------------------------------|------------------|---------|----------|
+| convergence | `baseline` (sync)             | claude-haiku-4-5 | 100.0%  | 66.7%    |
+| convergence | `baseline` (sequential)       | claude-haiku-4-5 | 83.3%   | 66.7%    |
+| convergence | `baseline` (sync)             | gpt-5-mini       | 100.0%  | 100.0%   |
+| convergence | `baseline` (sync)             | gpt-4o-mini      | 66.7%   | 83.3%    |
+| convergence | `baseline` (sequential)       | gpt-4o-mini      | 66.7%   | 66.7%    |
+| convergence | `autogen` RoundRobinGroupChat | gpt-4o-mini      | 83.3%   | **0.0%** |
+
+**Notable finding**: holding gpt-4o-mini constant, AutoGen's RoundRobinGroupChat collapsed on **0 of 6 sealed holdout scenarios** while the hand-rolled baseline collapsed on 5 of 6. The gap survives a reveal-protocol control: the sequential-reveal baseline (which matches AutoGen's in-round visibility pattern) still collapses 4 of 6 on the same fixtures. The framework choice is a load-bearing reliability variable, independent of both model and reveal protocol.
 
 Live leaderboard: <https://przm.sh/leaderboard>. Each row links to a signed receipt at <https://przm.sh/receipts/[id]>.
 
@@ -94,7 +108,7 @@ pnpm przm-bench run --adapter engram --fixture fixtures/longmemeval-temporal-inf
 LoCoMo and the other LongMemEval categories are v0.2 work. v0.1 ships
 only the temporal-inference subset.
 
-`onenomad-bench` is the CLI bin; outputs an unsigned receipt JSON. Signing happens in CI.
+`przm-bench` is the CLI bin; outputs an unsigned receipt JSON. Signing happens in CI.
 
 ---
 
@@ -158,7 +172,7 @@ przm-bench/
 │   │   └── aggregate.ts
 │   ├── runner.ts                        # memory benchmark runner
 │   ├── fixtures.ts / fixtures-convergence.ts
-│   ├── cli.ts                           # `onenomad-bench` CLI (memory-bench today)
+│   ├── cli.ts                           # `przm-bench` CLI (memory-bench today)
 │   ├── types.ts                         # memory adapter contract
 │   └── types-convergence.ts             # convergence adapter contract + Zod schemas
 ├── fixtures/
@@ -183,9 +197,9 @@ przm-bench/
 
 ## Status
 
-This is **v0.1 preview**. The headline finding (the 7.3× orchestration effect) is stable across the seen and holdout splits. What's shipping today is two adapters per axis. The surface is intentionally narrow so the methodology can stabilize before the comparison matrix gets wide.
+This is **v0.1 preview**. The headline finding (AutoGen's 0/6 vs baseline's 5/6 holdout collapse on gpt-4o-mini) is stable across the seen and holdout splits and survives a reveal-protocol control. What's shipping today is six adapter configurations on the convergence axis and a memory-recall harness with `engram` + `mem0` adapters. The surface is intentionally narrow so the methodology can stabilize before the comparison matrix gets wide.
 
-On the v0.2 roadmap: CrewAI adapter, LangGraph adapter, Letta memory adapter, Zep memory adapter. Receipts are versioned (`benchmark: 'convergence-v0.1-preview'`); any future schema change ships under a new version, and old receipts stay valid against their pinned schema.
+On the v0.2 roadmap: CrewAI adapter, LangGraph adapter, Letta memory adapter, Zep memory adapter, age/SOPS-encrypted holdout fixtures, multi-run aggregation for frameworks without a `seed` knob. Receipts are versioned (`benchmark: 'convergence-v0.1-preview'`); any future schema change ships under a new version, and old receipts stay valid against their pinned schema.
 
 ---
 
