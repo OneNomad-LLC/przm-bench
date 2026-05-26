@@ -1,4 +1,4 @@
-﻿name: Benchmark
+name: Benchmark
 
 on:
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: Checkout (full history)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
